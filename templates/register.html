@@ -1,0 +1,147 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+{% if errors: %}
+  {% for error in errors %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      {{ error.msg }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+{% endif %}
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="home-tab" data-toggle="tab" href="#student" role="tab" aria-controls="home" aria-selected="true">Student</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="profile-tab" data-toggle="tab" href="#teacher" role="tab" aria-controls="profile" aria-selected="false">Teacher</a>
+    </li>
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="student" role="tabpanel" aria-labelledby="student-tab">
+        <div class="row mt-5">
+            <div class="col-md-6 m-auto">
+              <div class="card card-body">
+                <h1 class="text-center mb-3">Student Register
+                </h1>
+                <form action="/registerst" method="POST">
+                  <div class="form-group">
+                    <label for="name">Name</label>
+                    <input
+                      type="name"
+                      id="name"
+                      name="name"
+                      class="form-control"
+                      placeholder="Enter Name"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="studentId">Student ID</label>
+                    <input
+                      type="studentId"
+                      id="studentId"
+                      name="studentId"
+                      class="form-control"
+                      placeholder="Student ID"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      class="form-control"
+                      placeholder="Enter Email"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="password">Password</label>
+                    <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      class="form-control"
+                      placeholder="Create Password"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="password2">Confirm Password</label>
+                    <input
+                      type="password"
+                      id="password2"
+                      name="password2"
+                      class="form-control"
+                      placeholder="Confirm Password"
+                    />
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-block">
+                    Register
+                  </button>
+                </form>
+                <p class="lead mt-4">Have An Account? <a href="/login">Login</a></p>
+              </div>
+            </div>
+          </div>
+    </div>
+    <div class="tab-pane fade" id="teacher" role="tabpanel" aria-labelledby="teacher-tab">
+        <div class="row mt-5">
+            <div class="col-md-6 m-auto">
+              <div class="card card-body">
+                <h1 class="text-center mb-3">Teacher Register
+                </h1>
+                <form action="/registertc" method="POST">
+                  <div class="form-group">
+                    <label for="name">Name</label>
+                    <input
+                      type="name"
+                      id="name"
+                      name="name"
+                      class="form-control"
+                      placeholder="Enter Name"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      class="form-control"
+                      placeholder="Enter Email"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="password">Password</label>
+                    <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      class="form-control"
+                      placeholder="Create Password"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="password2">Confirm Password</label>
+                    <input
+                      type="password"
+                      id="password2"
+                      name="password2"
+                      class="form-control"
+                      placeholder="Confirm Password"
+                    />
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-block">
+                    Register
+                  </button>
+                </form>
+                <p class="lead mt-4">Have An Account? <a href="/login">Login</a></p>
+              </div>
+            </div>
+          </div>
+    </div>
+    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
+  </div>
+  {% endblock %}
