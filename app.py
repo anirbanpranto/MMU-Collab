@@ -168,31 +168,84 @@ def registertc():
     else:
         return redirect('/register')
 
-@app.route('/loginst',methods=['POST'])
+@app.route('/studentdash')
+def studentdash():
+    if 'student' in session:
+        student = session['student']
+        print(student)
+        return render_template('studentdash.html',student=student)
+    else:
+        return redirect('/login')
+
+@app.route('/loginst',methods=['POST','GET'])
 def loginst():
     #student login logic
     if request.method == "POST":
         password = str(request.form['password'])
         email = str(request.form['email'])
-        print(password+" "+email)
-        return redirect('/')
+        if not email or not password:
+            error = 'Please fill in all the data'
+            return render_template('login',error=error)
+        check = Student.query.filter_by(email=email).first()
+        print(check.password)
+        if check and bcrypt.check_password_hash(str(check.password), password):
+            student = {
+                'name' : check.name,
+                'student_id' : check.student_id,
+                'student_email' : check.email,
+                'reminders' : check.reminders,
+                'personal_tasks' : check.personal_tasks,
+                'enrollments' : check.enrollments
+            }
+            session['student'] = student
+            return redirect('/studentdash')
+        else:
+            error = 'Invalid Email or Password'
+            return render_template('login',error=error)
 
-@app.route('/logintc',methods=['POST'])
+@app.route('/teacherdash')
+def teacherdash():
+    if 'teacher' in session:
+        teacher = session['teacher']
+        print(teacher)
+        return render_template('teacherdash.html',teacher=teacher)
+    else:
+        return redirect('/login')
+
+@app.route('/logintc',methods=['POST','GET'])
 def logintc():
     if request.method == "POST":
         password = str(request.form['password'])
         email = str(request.form['email'])
-    #teacher login logic
-    pass
+        if not email or not password:
+            error = 'Please fill in all the data'
+            return render_template('login',error=error)
+        check = Teacher.query.filter_by(email=email).first()
+        print(check.password)
+        if check and bcrypt.check_password_hash(str(check.password), password):
+            teacher = {
+                'name' : check.name,
+                'id' : check.teacher_id,
+                'email' : check.email,
+                'courses' : check.courses
+            }
+            session['teacher'] = teacher
+            return redirect('/teacherdash')
+        else:
+            error = 'Invalid Email or Password'
+            return render_template('login',error=error)
 
-@app.route('/logoutst',methods=['POST'])
+@app.route('/logoutst')
 def logoutst():
     #student logout logic
-    pass
+    session.pop('student',None)
+    return redirect('/login')
 
-@app.route('/logouttc',methods=['POST'])
+@app.route('/logouttc')
 def logouttc():
     #teacher logout logic
+    session.pop('teacher',None)
+    return redirect('/login')
     pass
 if __name__ == "__main__":
     app.run(debug=True)

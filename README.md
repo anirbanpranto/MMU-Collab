@@ -7,3 +7,4 @@ This is an app for university students and Professors who can collaborate on the
 * v2.0 (Made Schema for all dbs)
 * v3.0 (Tested Schema and Relationships, Works well) :D
 * v4.0 (Created the registration handling and tested them)
+* v5.0 (Login handling has been implemented for teachers and students)

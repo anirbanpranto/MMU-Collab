@@ -1,1 +1,6 @@
-Teacher
+{% extends 'layout.html' %}
+
+{% block body %}
+Hello {{ teacher.name }}
+<button onclick="document.location='/logouttc'" class="btn btn-primary btn-block">Logout</button>
+{% endblock %}
