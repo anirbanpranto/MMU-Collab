@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, url_for, redirect, session
+from flask import Flask, render_template, request, url_for, redirect, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
-
+app.secret_key = 'secret'
+bcrypt = Bcrypt()
 ##Database Models
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db = SQLAlchemy(app)
@@ -31,14 +33,14 @@ class Personal_task(db.Model):
     student_id = db.Column(db.String(80), db.ForeignKey('student.student_id'), nullable=False) #fk
     task_body = db.Column(db.String(240), nullable=False)
     def __repr__(self):
-        return f"Enrollment('{self.task_id}', '{self.student_id}', '{self.task_body}')"
+        return f"Personal_task('{self.task_id}', '{self.student_id}', '{self.task_body}')"
 
 class Post(db.Model):
     post_id = db.Column(db.Integer, primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.course_id'),nullable=False) #fk
     post_body = db.Column(db.String(80), nullable=False)
     def __repr__(self):
-        return f"Enrollment('{self.post_id}', '{self.course_id}', '{self.post_body}')"
+        return f"Post('{self.post_id}', '{self.course_id}', '{self.post_body}')"
 
 class Uni_task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
@@ -46,7 +48,7 @@ class Uni_task(db.Model):
     task_body = db.Column(db.String(100), nullable=False)
     task_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     def __repr__(self):
-        return f"Enrollment('{self.task_id}', '{self.course_id}', '{self.task_body}', {self.task_date})"
+        return f"Uni_Task('{self.task_id}', '{self.course_id}', '{self.task_body}', {self.task_date})"
 
 class Course(db.Model):
     course_id = db.Column(db.Integer, primary_key=True)
@@ -56,7 +58,7 @@ class Course(db.Model):
     posts = db.relationship('Post', backref = "classroom", lazy=True)
     task_id = db.relationship('Uni_task', backref="coursework", lazy=True)
     def __repr__(self):
-        return f"Enrollment('{self.teacher_id}', '{self.course_id}', '{self.course_title}')"
+        return f"Course('{self.teacher_id}', '{self.course_id}', '{self.course_title}')"
 
 class Reminder(db.Model):
     reminder_id = db.Column(db.Integer, primary_key=True)
@@ -64,7 +66,7 @@ class Reminder(db.Model):
     student_id = db.Column(db.String(80), db.ForeignKey('student.student_id'), nullable=False) #fk
     reminder_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     def __repr__(self):
-        return f"Enrollment('{self.reminder_id}', '{self.reminder_date}', {self.reminder_body})"
+        return f"Reminder('{self.reminder_id}', '{self.reminder_date}', {self.reminder_body})"
 
 class Teacher(db.Model):
     teacher_id = db.Column(db.Integer, primary_key=True)
@@ -73,7 +75,7 @@ class Teacher(db.Model):
     password = db.Column(db.String(80), nullable=False)
     courses = db.relationship('Course', backref='lecturer', lazy=True)
     def __repr__(self):
-        return f"Enrollment('{self.teacher_id}', '{self.name}', '{self.email}')"
+        return f"Teacher('{self.teacher_id}', '{self.name}', '{self.email}')"
 ## Routes
 @app.route('/')
 def index():
@@ -94,32 +96,77 @@ def register():
     #register page
     return render_template('register.html')
 
-@app.route('/registerst',methods=['POST'])
+@app.route('/registerst',methods=['POST','GET'])
 def registerst():
     #student register logic
+    errors = []
     if request.method == "POST":
         name = str(request.form['name'])
-        id = str(request.form['id'])
+        student_id = str(request.form['studentId'])
         password = str(request.form['password'])
         password2 = str(request.form['password2'])
         email = str(request.form['email'])
         #email find
-        #password hash
-        #database push
-        return redirect('login')
+        check = Student.query.filter_by(email=email).first()
+        check = Student.query.get(student_id)
+        print(check)
+        if not password or not name or not student_id or not password2 or not email:
+            errors.append('Please fill in all the information')
+        if check:
+            errors.append('User Already Exists')
+        if password != password2:
+            errors.append('Passwords do not match')
+        if len(password) < 6:
+            errors.append('Passwords need to be at least 6 characters')
+        if errors:
+            return render_template('register.html', errors=errors)
+        else:
+            #password hash
+            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+            print(hashed_password)
+            #database push
+            user = Student(email=email, student_id = student_id, password = hashed_password, name = name)
+            db.session.add(user)
+            db.session.commit()
+            flash('You can now Login!', 'success_msg')
+            return redirect('login')
+    else:
+        return redirect('/register')
 
 
-@app.route('/registertc',methods=['POST'])
+@app.route('/registertc',methods=['POST', 'GET'])
 def registertc():
     if request.method == "POST":
         name = str(request.form['name'])
         password = str(request.form['password'])
         password2 = str(request.form['password2'])
         email = str(request.form['email'])
-        #password hash
-        #database push
-    #teacher register logic
-    return redirect('login')
+        #checks
+        errors= []
+        check = Teacher.query.filter_by(email=email).first()
+        print(check)
+        if not password or not name or not password2 or not email:
+            errors.append('Please fill in all the information')
+        if check:
+            errors.append('User Already Exists')
+        if password != password2:
+            errors.append('Passwords do not match')
+        if len(password) < 6:
+            errors.append('Passwords need to be at least 6 characters')
+        if errors:
+            return render_template('register.html', errors=errors)
+        else:
+            #password hash
+            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+            print(hashed_password)
+            #database push
+            user = Teacher(email=email, password = hashed_password, name = name)
+            db.session.add(user)
+            db.session.commit()
+            flash('You can now Login!', 'success_msg')
+            return redirect('login')
+    else:
+        return redirect('/register')
 
 @app.route('/loginst',methods=['POST'])
 def loginst():
