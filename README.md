@@ -1,4 +1,4 @@
-#MMU COLLAB
+# MMU COLLAB
 This is an app for university students and Professors who can collaborate on their work together through this app.
 
 ## Version History
