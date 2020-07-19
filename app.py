@@ -172,8 +172,11 @@ def registertc():
 def studentdash():
     if 'student' in session:
         student = session['student']
-        print(student)
-        return render_template('studentdash.html',student=student)
+        todo = Personal_task.query.filter_by(student_id = student["student_id"])
+        tasks = {}
+        for task in todo:
+            tasks[task.task_id] = task.task_body
+        return render_template('studentdash.html',student=student,tasks=tasks)
     else:
         return redirect('/login')
 
@@ -187,28 +190,27 @@ def loginst():
             error = 'Please fill in all the data'
             return render_template('login',error=error)
         check = Student.query.filter_by(email=email).first()
-        print(check.password)
         if check and bcrypt.check_password_hash(str(check.password), password):
             student = {
                 'name' : check.name,
                 'student_id' : check.student_id,
-                'student_email' : check.email,
-                'reminders' : check.reminders,
-                'personal_tasks' : check.personal_tasks,
-                'enrollments' : check.enrollments
+                'student_email' : check.email
             }
             session['student'] = student
             return redirect('/studentdash')
         else:
             error = 'Invalid Email or Password'
-            return render_template('login',error=error)
+            return render_template('login.html',error=error)
 
 @app.route('/teacherdash')
 def teacherdash():
     if 'teacher' in session:
         teacher = session['teacher']
-        print(teacher)
-        return render_template('teacherdash.html',teacher=teacher)
+        courses = Course.query.filter_by(teacher_id = teacher["id"])
+        mapuh = {}
+        for course in courses:
+            mapuh[course.course_id] = course.course_title
+        return render_template('teacherdash.html',teacher=teacher, mapuh=mapuh)
     else:
         return redirect('/login')
 
@@ -221,19 +223,21 @@ def logintc():
             error = 'Please fill in all the data'
             return render_template('login',error=error)
         check = Teacher.query.filter_by(email=email).first()
-        print(check.password)
         if check and bcrypt.check_password_hash(str(check.password), password):
+            mapuh = {}
+            for course in check.courses:
+                mapuh[course.course_id] = course.course_title
             teacher = {
                 'name' : check.name,
                 'id' : check.teacher_id,
                 'email' : check.email,
-                'courses' : check.courses
+                'courses' : mapuh
             }
             session['teacher'] = teacher
             return redirect('/teacherdash')
         else:
             error = 'Invalid Email or Password'
-            return render_template('login',error=error)
+            return render_template('login.html',error=error)
 
 @app.route('/logoutst')
 def logoutst():
@@ -246,6 +250,32 @@ def logouttc():
     #teacher logout logic
     session.pop('teacher',None)
     return redirect('/login')
-    pass
+
+@app.route('/add', methods=['POST', 'GET'])
+def add():
+    #add a new entry
+    if request.method == "POST":
+        if 'student' in session:
+            student = session['student']
+            todo = str(request.form['task'])
+            if todo != '':
+                data = Personal_task(task_body=todo, student_id = student['student_id'])
+                db.session.add(data)
+                db.session.commit()
+            return redirect('/studentdash')
+        else:
+            return redirect('/login')
+    else:
+        return redirect('/login')
+
+@app.route('/del', methods=['POST','GET'])
+def delete():
+    todo = str(request.form['task_id'])
+    #delete the entry
+    data = Personal_task.query.filter_by(task_id=todo).first()
+    db.session.delete(data)
+    db.session.commit()
+    return redirect('/studentdash')
+
 if __name__ == "__main__":
     app.run(debug=True)

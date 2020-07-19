@@ -1,6 +1,25 @@
 {% extends 'layout.html' %}
 
+{% block navbar %}
+<div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/create">Tasks</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/coursestc">Courses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/posts">Posts</a>
+            </li>
+        </ul>
+</div>
+<a class="navbar-brand ml-auto" href="/logouttc">Logout</a>
+{% endblock %}
 {% block body %}
-Hello {{ teacher.name }}
-<button onclick="document.location='/logouttc'" class="btn btn-primary btn-block">Logout</button>
+<div class="row mt-5">
+  <div class="col-md-6 m-auto">
+    <h1>Hello {{ teacher.name }}</h1>
+  </div>
+</div>
 {% endblock %}

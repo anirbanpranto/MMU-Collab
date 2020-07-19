@@ -3,3 +3,10 @@ body{
     margin: 50px 0px 0px 0px;
     z-index: 0;
 }
+.card .task{
+    background-color: thistle;
+    padding: 14px;
+}
+row{
+    margin: 10px;
+}

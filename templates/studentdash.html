@@ -1,6 +1,75 @@
 {% extends 'layout.html' %}
 
-{% block body %}
-Hello {{ student.name }}
-<button onclick="document.location='/logoutst'" class="btn btn-primary btn-block">Logout</button>
+{% block navbar %}
+<div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/reminders">Reminders</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/todo">Tasks</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/assignments">Assignments</a>
+            </li>
+        </ul>
+</div>
+<a class="navbar-brand ml-auto" href="/logoutst">Logout</a>
 {% endblock %}
+
+{% block body %}
+<div class="row mt-5">
+  <div class="col-md-6 m-auto">
+    <h1>Hello {{ student.name }}</h1>
+  </div>
+</div>
+<div class="row mt-5">
+    <div class="col-md-6 m-auto">
+      <div class="card card-body">
+        <form action="/add" method="POST">
+          <div class="form-group">
+            <label for="task">Task</label>
+            <input
+              type="task"
+              id="task"
+              name="task"
+              class="form-control"
+              placeholder="Enter Task"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">
+            Add Todo
+          </button>
+        </form>
+      </div>
+        {% for task in (tasks): %}
+            <br>
+            <div class="row row-content justify-content-end">
+                  <div class="col col-8">
+                    <div class="card">
+                        <div class="card-body task">
+                            {{ tasks[task] }}
+                        </div>
+                    </div>
+                  </div>
+                  <div class="col-4 col-sm-3">
+                    <form action="/del" method="POST">
+                      <div class="form-group">
+                        <button
+                          type="submit"
+                          id="task_id"
+                          name="task_id"
+                          class="btn btn-primary"
+                          value={{ task }}
+                        >Delete</button>
+                      </div>
+                    </form>
+                  </div>
+            </div>
+        {% endfor %}
+  </div>
+<!-- Body will render posts from all his courses -->
+{% endblock %}
+<!-- View Reminders and Make them -->
+<!-- View/Delete/Add Todolist -->
+<!-- Enroll to courses -->

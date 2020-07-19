@@ -8,3 +8,4 @@ This is an app for university students and Professors who can collaborate on the
 * v3.0 (Tested Schema and Relationships, Works well) :D
 * v4.0 (Created the registration handling and tested them)
 * v5.0 (Login handling has been implemented for teachers and students)
+* v6.0 (Student's personal task feature update)
