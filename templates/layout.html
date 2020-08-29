@@ -4,20 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://bootswatch.com/4/lux/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://bootswatch.com/4/litera/bootstrap.min.css"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <title>MMU Collab</title>
 </head>
 <body>
     <nav class="navbar navbar-dark navbar-expand-sm fixed-top bg-primary">
         <div class="container">
-            <a class="navbar-brand mr-auto" href="/">MMU COLLAB</a>
+            <a class="navbar-brand mr-auto" href="/"><strong>MMU COLLAB</strong></a>
         </div>
         {% block navbar %}
         {% endblock %}
     </nav>
     <div class="container">
       {% block body %}
+      {% endblock %}
+    </div>
+    <div class="container">
+      {% block stuff %}
       {% endblock %}
     </div>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>

@@ -51,7 +51,7 @@ class Uni_task(db.Model):
         return f"Uni_Task('{self.task_id}', '{self.course_id}', '{self.task_body}', {self.task_date})"
 
 class Course(db.Model):
-    course_id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.String(10), primary_key=True)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.teacher_id'), nullable=False) #fk
     course_title = db.Column(db.String(80), nullable=False)
     enrollments = db.relationship('Enrollment', backref = "enrolled", lazy=True)
@@ -211,6 +211,33 @@ def teacherdash():
         for course in courses:
             mapuh[course.course_id] = course.course_title
         return render_template('teacherdash.html',teacher=teacher, mapuh=mapuh)
+    else:
+        return redirect('/login')
+
+#create a course
+@app.route('/coursestc')
+def teachercourse():
+    if 'teacher' in session:
+        teacher = session['teacher']
+        courses = Course.query.filter_by(teacher_id = teacher["id"])
+        mapuh = {}
+        for course in courses:
+            mapuh[course.course_id] = course.course_title
+        return render_template('createcourse.html',teacher = teacher, mapuh=mapuh)
+    else:
+        return redirect('/login')
+
+@app.route('/crtclass',methods=['POST', 'GET'])
+def createcourse():
+    if 'teacher' in session:
+        teacher = session['teacher']
+        teacher_id = teacher["id"]
+        course_id = str(request.form['id'])
+        course_name = str(request.form['name'])
+        course = Course(course_id = course_id, teacher_id = teacher_id, course_title = course_name)
+        db.session.add(course)
+        db.session.commit()
+        return redirect('/teacherdash')
     else:
         return redirect('/login')
 

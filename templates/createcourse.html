@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+
+{% block navbar %}
+<div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/create">Create</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/coursestc">Courses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/posts">Post</a>
+            </li>
+        </ul>
+</div>
+<a class="navbar-brand ml-auto" href="/logouttc">Logout</a>
+{% endblock %}
+
+{% block body %}
+        <div class="row mt-5">
+            <div class="col-md-6 m-auto">
+              <div class="card card-body">
+                <h1 class="text-center mb-3">Create Course</h1>
+                <form action="/crtclass" method="POST">
+                  <div class="form-group">
+                    <label for="coursename">Name</label>
+                    <input
+                      type="name"
+                      id="name"
+                      name="name"
+                      class="form-control"
+                      placeholder="Enter Name"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="id">Class ID</label>
+                    <input
+                      type="id"
+                      id="id"
+                      name="id"
+                      class="form-control"
+                      placeholder="Enter Class ID"
+                    />
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-block">Create</button>
+                </form>
+              </div>
+            </div>
+{% endblock %}

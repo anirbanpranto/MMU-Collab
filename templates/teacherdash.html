@@ -4,13 +4,13 @@
 <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a class="nav-link" href="/create">Tasks</a>
+                <a class="nav-link" href="/create">Create</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/coursestc">Courses</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/posts">Posts</a>
+                <a class="nav-link" href="/posts">Post</a>
             </li>
         </ul>
 </div>
@@ -22,4 +22,16 @@
     <h1>Hello {{ teacher.name }}</h1>
   </div>
 </div>
+{% endblock %}
+{% block stuff %}
+{% for map in mapuh %}
+<br>
+<div class="row">
+    <div class="col-md-6 m-auto">
+      <div class="card card-body">
+        <h3 class="text-center mb-3">{{ mapuh[map] }}</h3>
+      </div>
+    </div>
+</div>
+{% endfor %}
 {% endblock %}
