@@ -1,147 +1,149 @@
 {% extends 'layout.html' %}
 
-{% block body %}
 {% if errors: %}
   {% for error in (errors): %}
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-      {{ error }}
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
+    {{ error }}
   {% endfor %}
 {% endif %}
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-    <li class="nav-item">
-      <a class="nav-link active" id="home-tab" data-toggle="tab" href="#student" role="tab" aria-controls="home" aria-selected="true">Student</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" id="profile-tab" data-toggle="tab" href="#teacher" role="tab" aria-controls="profile" aria-selected="false">Teacher</a>
-    </li>
-  </ul>
-  <div class="tab-content" id="myTabContent">
-    <div class="tab-pane fade show active" id="student" role="tabpanel" aria-labelledby="student-tab">
-        <div class="row mt-5">
-            <div class="col-md-6 m-auto">
-              <div class="card card-body">
-                <h1 class="text-center mb-3">Student Register
-                </h1>
-                <form action="/registerst" method="POST">
-                  <div class="form-group">
-                    <label for="name">Name</label>
-                    <input
-                      type="name"
-                      id="name"
-                      name="name"
-                      class="form-control"
-                      placeholder="Enter Name"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="studentId">Student ID</label>
-                    <input
-                      type="studentId"
-                      id="studentId"
-                      name="studentId"
-                      class="form-control"
-                      placeholder="Student ID"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="email">Email</label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      class="form-control"
-                      placeholder="Enter Email"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="password">Password</label>
-                    <input
-                      type="password"
-                      id="password"
-                      name="password"
-                      class="form-control"
-                      placeholder="Create Password"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="password2">Confirm Password</label>
-                    <input
-                      type="password"
-                      id="password2"
-                      name="password2"
-                      class="form-control"
-                      placeholder="Confirm Password"
-                    />
-                  </div>
-                  <button type="submit" class="btn btn-primary btn-block">
-                    Register
-                  </button>
-                </form>
-                <p class="lead mt-4">Have An Account? <a href="/login">Login</a></p>
-              </div>
-            </div>
-          </div>
-    </div>
-    <div class="tab-pane fade" id="teacher" role="tabpanel" aria-labelledby="teacher-tab">
-        <div class="row mt-5">
-            <div class="col-md-6 m-auto">
-              <div class="card card-body">
-                <h1 class="text-center mb-3">Teacher Register
-                </h1>
-                <form action="/registertc" method="POST">
-                  <div class="form-group">
-                    <label for="name">Name</label>
-                    <input
-                      type="name"
-                      id="name"
-                      name="name"
-                      class="form-control"
-                      placeholder="Enter Name"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="email">Email</label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      class="form-control"
-                      placeholder="Enter Email"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="password">Password</label>
-                    <input
-                      type="password"
-                      id="password"
-                      name="password"
-                      class="form-control"
-                      placeholder="Create Password"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="password2">Confirm Password</label>
-                    <input
-                      type="password"
-                      id="password2"
-                      name="password2"
-                      class="form-control"
-                      placeholder="Confirm Password"
-                    />
-                  </div>
-                  <button type="submit" class="btn btn-primary btn-block">
-                    Register
-                  </button>
-                </form>
-                <p class="lead mt-4">Have An Account? <a href="/login">Login</a></p>
-              </div>
-            </div>
-          </div>
-    </div>
-    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
+
+{% block navroute %}
+/
+{% endblock %}
+
+{% block navitem %}
+<ul id="nav-mobile" class="right hide-on-med-and-down">
+    <li><a href="/about">About</a></li>
+    <li><a href="/faq">FAQ</a></li>
+</ul>
+{% endblock %}
+
+{% block body %}
+
+<div class="row">
+  <div class="col s12">
+    <ul class="tabs">
+      <div class="col s2"></div>
+      <li class="tab col s3 light-blue"><a class="active white-text" href="#teacher">Teacher</a></li>
+      <div class="col s2"></div>
+      <li class="tab col s3 light-blue"><a class="white-text" href="#student">Student</a></li>
+      <div class="col s2"></div>
+    </ul>
   </div>
-  {% endblock %}
+  <!-- Teacher Form -->
+  <div id="teacher" class="col s12">
+    <!-- Card -->
+  <div class="row">
+    <div class="col s2 m2">
+
+    </div>
+    <div class="col s8 m8">
+      <div class="card">
+        <div class="card-content">
+          <span class="card-title center">Register as  a Teacher</span>
+          <!-- Form -->
+          <div class="row">
+            <form class="col s12" action="/registertc" method="post">
+              <div class="row">
+                <div class="input-field col s12">
+                  <input id="name" type="text" name = "name" class="validate">
+                  <label for="name">Full Name</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <input id="password" type="password" name="password" class="validate">
+                  <label for="password">Password</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <input id="password2" type="password" name="password2" class="validate">
+                  <label for="password2">Confirm Password</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <input id="email" type="email" name = "email" class="validate">
+                  <label for="email">Email</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                  <input type="submit" name="submit" value="submit" class="btn light-blue">
+                </div>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="col s2 m2">
+
+    </div>
+  </div>
+  </div>
+  <!-- Student form -->
+  <div id="student" class="col s12">
+    <div class="row">
+      <div class="col s2 m2">
+
+      </div>
+      <div class="col s8 m8">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title center">Register as a Student</span>
+            <!-- Form -->
+            <div class="row">
+              <form class="col s12" action="/registerst" method="post">
+                <div class="row">
+                  <div class="input-field col s12">
+                    <input id="name" type="text" name = "name" class="validate">
+                    <label for="name">Full Name</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <input id="studentId" type="text" name = "studentId" class="validate">
+                    <label for="studentId">ID</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <input id="password" type="password" name="password" class="validate">
+                    <label for="password">Password</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <input id="password2" type="password" name="password2" class="validate">
+                    <label for="password2">Confirm Password</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <input id="email" type="email" name = "email" class="validate">
+                    <label for="email">Email</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s6">
+                    <input type="submit" name="submit" value="submit" class="btn light-blue">
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col s2 m2">
+
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    var el = document.querySelector('.tabs');
+    var instance = M.Tabs.init(el, {});
+</script>
+{% endblock %}

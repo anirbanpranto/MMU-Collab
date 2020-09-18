@@ -1,12 +1,28 @@
-body{
-    padding: 50px 0px 0px 0px;
-    margin: 50px 0px 0px 0px;
-    z-index: 0;
+.brand-logo{
+    font-family: 'IBM Plex Sans', sans-serif;
 }
-.card .task{
-    background-color: thistle;
-    padding: 14px;
+
+html,body,.row{
+    height: 100%;
 }
-row{
-    margin: 10px;
+
+.tabs{
+    margin-top: 50px;
+}
+
+.course_card{
+  height: 150px;
+}
+
+.post_body{
+  word-wrap    : break-word;
+  overflow-wrap: break-word;
+}
+
+.modal-course{
+  margin-top: 50px;
+}
+
+.course-nav{
+  margin-bottom: 50px;
 }

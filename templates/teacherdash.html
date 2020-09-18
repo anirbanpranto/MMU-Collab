@@ -1,37 +1,83 @@
 {% extends 'layout.html' %}
 
-{% block navbar %}
-<div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="/create">Create</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/coursestc">Courses</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/posts">Post</a>
-            </li>
-        </ul>
-</div>
-<a class="navbar-brand ml-auto" href="/logouttc">Logout</a>
-{% endblock %}
+{% block navroute %}
+/
+{% endblock navroute %}
+
+{% block navitem %}
+<ul id="nav-mobile" class="right hide-on-med-and-down">
+    <li><a href="/logouttc">Logout</a></li>
+</ul>
+{% endblock navitem %}
 {% block body %}
-<div class="row mt-5">
-  <div class="col-md-6 m-auto">
-    <h1>Hello {{ teacher.name }}</h1>
-  </div>
+<div class="row center-align">
+  <button data-target="modal1" class="btn-floating btn-large light-blue modal-course modal-trigger"><i class="material-icons">add</i></button>
 </div>
-{% endblock %}
-{% block stuff %}
-{% for map in mapuh %}
-<br>
 <div class="row">
-    <div class="col-md-6 m-auto">
-      <div class="card card-body">
-        <h3 class="text-center mb-3">{{ mapuh[map] }}</h3>
+{% if not mapuh %}
+<div class="row center-align">
+  <h3>OOPS! No course yet!</h3>
+</div>
+{% endif %}
+{% for course in mapuh %}
+<!-- CODE/ID -->
+    <div class="col s12 m6">
+      <div class="card">
+        <div class="card-content course_card">
+          <span class="card-title">{{course}}({{mapuh[course]}})</span>
+        </div>
+        <div class="card-action">
+          <form class="" action="/get_course" method="post">
+            <input type="hidden" id="course_id" name="course_id" value="{{course}}">
+            <input type="hidden" id="course_title" name="course_title" value="{{mapuh[course]}}">
+            <input class="btn light-blue white-text" type="submit" name="go_button" value="See Course">
+          </form>
+        </div>
       </div>
     </div>
-</div>
 {% endfor %}
+</div>
+<!-- Modal Trigger -->
+
+<!-- Modal Structure -->
+<div id="modal1" class="modal">
+  <div class="modal-content">
+    <div class="col s12 m6">
+      <div class="card">
+        <div class="card-content">
+          <span class="card-title">Create a new course</span>
+        </div>
+        <div class="card-action">
+          <form class="validate" action="/addcourse" method="post">
+            <div class="row">
+              <div class="input-field col s12">
+                <input id="course_id" type="text" name = "course_id" class="validate">
+                <label for="course_id">Course Code</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <input id="course_name" type="text" name = "course_name" class="validate">
+                <label for="course_name">Course Name</label>
+              </div>
+            </div>
+            <input type="hidden" name="teacher_id" value="{{teacher.id}}">
+            <div class="row">
+              <div class="input-field col s6">
+                <input type="submit" name="submit" value="submit" class="btn light-blue">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('.modal');
+    var instances = M.Modal.init(elems);
+  });
+</script>
 {% endblock %}

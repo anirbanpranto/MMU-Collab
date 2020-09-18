@@ -1,109 +1,118 @@
 {% extends 'layout.html' %}
 
-{% block body %}
-{% if success_msg: %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    {{ success_msg }}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-{% endif %}
-{% if error_msg: %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    {{ error_msg }}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-{% endif %}
-{% if error: %}
-  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+{% if errors: %}
+  {% for error in (errors): %}
     {{ error }}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+  {% endfor %}
 {% endif %}
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-    <li class="nav-item">
-      <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Student</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Teacher</a>
-    </li>
-  </ul>
-  <div class="tab-content" id="myTabContent">
-    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-        <div class="row mt-5">
-            <div class="col-md-6 m-auto">
-              <div class="card card-body">
-                <h1 class="text-center mb-3">Student Login</h1>
-                <form action="/loginst" method="POST">
-                  <div class="form-group">
-                    <label for="email">Email</label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      class="form-control"
-                      placeholder="Enter Email"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="password">Password</label>
-                    <input
-                      type="password"
-                      id="password"
-                      name="password"
-                      class="form-control"
-                      placeholder="Enter Password"
-                    />
-                  </div>
-                  <button type="submit" class="btn btn-primary btn-block">Login</button>
-                </form>
-                <p class="lead mt-4">
-                  No Account? <a href="/register">Register</a>
-                </p>
-              </div>
-            </div>
-          </div>
-    </div>
-    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-        <div class="row mt-5">
-            <div class="col-md-6 m-auto">
-              <div class="card card-body">
-                <h1 class="text-center mb-3">Teacher Login</h1>
-                <form action="/logintc" method="POST">
-                  <div class="form-group">
-                    <label for="email">Email</label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      class="form-control"
-                      placeholder="Enter Email"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="password">Password</label>
-                    <input
-                      type="password"
-                      id="password"
-                      name="password"
-                      class="form-control"
-                      placeholder="Enter Password"
-                    />
-                  </div>
-                  <button type="submit" class="btn btn-primary btn-block">Login</button>
-                </form>
-                <p class="lead mt-4">
-                  No Account? <a href="/register">Register</a>
-                </p>
-              </div>
-            </div>
-          </div>
-    </div>
-    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
+
+{% block navroute %}
+/
+{% endblock %}
+
+{% block navitem %}
+<ul id="nav-mobile" class="right hide-on-med-and-down">
+    <li><a href="/about">About</a></li>
+    <li><a href="/faq">FAQ</a></li>
+</ul>
+{% endblock %}
+
+{% block body %}
+
+<div class="row">
+  <div class="col s12">
+    <ul class="tabs">
+      <div class="col s2"></div>
+      <li class="tab col s3 light-blue"><a class="active white-text" href="#teacher">Teacher</a></li>
+      <div class="col s2"></div>
+      <li class="tab col s3 light-blue"><a class="white-text" href="#student">Student</a></li>
+      <div class="col s2"></div>
+    </ul>
   </div>
+  <!-- Teacher Form -->
+  <div id="teacher" class="col s12">
+    <!-- Card -->
+  <div class="row">
+    <div class="col s2 m2">
+
+    </div>
+    <div class="col s8 m8">
+      <div class="card">
+        <div class="card-content">
+          <span class="card-title center">Teacher</span>
+          <!-- Form -->
+          <div class="row">
+            <form class="col s12" action="/logintc" method="post">
+              <div class="row">
+                <div class="input-field col s12">
+                  <input id="email" type="email" name = "email" class="validate">
+                  <label for="email">Email</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <input id="password" type="password" name="password" class="validate">
+                  <label for="password">Password</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                  <input type="submit" name="submit" value="submit" class="btn light-blue">
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col s2 m2">
+
+    </div>
+  </div>
+  </div>
+  <!-- Student form -->
+  <div id="student" class="col s12">
+    <div class="row">
+      <div class="col s2 m2">
+
+      </div>
+      <div class="col s8 m8">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title center">Student</span>
+            <!-- Form -->
+            <div class="row">
+              <form class="col s12" action="/loginst" method="post">
+                <div class="row">
+                  <div class="input-field col s12">
+                    <input id="email" type="email" name = "email" class="validate">
+                    <label for="email">Email</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <input id="password" type="password" name="password" class="validate">
+                    <label for="password">Password</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s6">
+                    <input type="submit" name="submit" value="submit" class="btn light-blue">
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col s2 m2">
+
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    var el = document.querySelector('.tabs');
+    var instance = M.Tabs.init(el, {});
+</script>
 {% endblock %}

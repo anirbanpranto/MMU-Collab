@@ -1,16 +1,44 @@
 {% extends 'layout.html' %}
 
+
+{% block navroute %}
+/
+{% endblock navroute %}
+
+{% block navitem %}
+<ul id="nav-mobile" class="right hide-on-med-and-down">
+    <li><a href="/about">About</a></li>
+    <li><a href="/faq">FAQ</a></li>
+</ul>
+{% endblock navitem %}
+
+
 {% block body %}
-<div class="row mt-5">
-    <div class="col-md-6 m-auto">
-      <div class="card card-body">
-        <h1 class="text-center mb-3">Welcome
-        </h1>
-        <button onclick="document.location='/login'" class="btn btn-primary btn-block">Login
-        </button>
-        <button onclick="document.location='/register'" class="btn btn-primary btn-block">Create New Account
-        </button>
+<div class="row">
+  <div class="col s2 m2">
+
+  </div>
+  <div class="col s8 m8">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title center"><h2>Welcome</h2></span>
+          <div class="container">
+            <div class="row">
+              <div class="col s12"></div>
+              <div class="col s12"></div>
+              <div class="col s12"></div>
+              <div class="col s12"></div>
+              <div class="col s12"></div>
+              <button onclick="document.location='/register'" class="btn light-blue col s12 m5">Register</button>
+              <div class="col s12 m2"></div>
+              <button onclick="document.location='/login'" class="btn light-blue col s12 m5">Login</button>
+            </div>
+          </div>
       </div>
     </div>
   </div>
+  <div class="col s2 m2">
+
+  </div>
+</div>
 {% endblock %}

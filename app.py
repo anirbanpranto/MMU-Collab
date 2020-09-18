@@ -38,17 +38,20 @@ class Personal_task(db.Model):
 class Post(db.Model):
     post_id = db.Column(db.Integer, primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.course_id'),nullable=False) #fk
-    post_body = db.Column(db.String(80), nullable=False)
+    post_body = db.Column(db.String(1000), nullable=False)
+    post_title = db.Column(db.String(80), nullable=False)
+    post_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     def __repr__(self):
-        return f"Post('{self.post_id}', '{self.course_id}', '{self.post_body}')"
+        return f"Post('{self.post_id}', '{self.course_id}', '{self.post_body}', '{self.post_title}')"
 
 class Uni_task(db.Model):
+    task_title = db.Column(db.String(100), nullable=False)
     task_id = db.Column(db.Integer, primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.course_id'),nullable=False) #fk
-    task_body = db.Column(db.String(100), nullable=False)
-    task_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    task_body = db.Column(db.String(1000), nullable=False)
+    task_date = db.Column(db.DateTime, nullable=False)
     def __repr__(self):
-        return f"Uni_Task('{self.task_id}', '{self.course_id}', '{self.task_body}', {self.task_date})"
+        return f"Uni_Task('{self.task_title}','{self.task_id}', '{self.course_id}', '{self.task_body}', {self.task_date})"
 
 class Course(db.Model):
     course_id = db.Column(db.String(10), primary_key=True)
@@ -79,21 +82,37 @@ class Teacher(db.Model):
 ## Routes
 @app.route('/')
 def index():
+    if 'student' in session:
+        return redirect('/studentdash')
+    if 'teacher' in session:
+        return redirect('/teacherdash')
     return render_template('index.html')
 
 @app.route('/home')
 def home():
+    if 'student' in session:
+        return redirect('/studentdash')
+    if 'teacher' in session:
+        return redirect('/teacherdash')
     #home page
     return redirect('/')
 
 @app.route('/login')
 def login():
     #login page
+    if 'student' in session:
+        return redirect('/studentdash')
+    if 'teacher' in session:
+        return redirect('/teacherdash')
     return render_template('login.html')
 
 @app.route('/register')
 def register():
     #register page
+    if 'student' in session:
+        return redirect('/studentdash')
+    if 'teacher' in session:
+        return redirect('/teacherdash')
     return render_template('register.html')
 
 @app.route('/registerst',methods=['POST','GET'])
@@ -205,6 +224,7 @@ def loginst():
 @app.route('/teacherdash')
 def teacherdash():
     if 'teacher' in session:
+        session.pop('course',None)
         teacher = session['teacher']
         courses = Course.query.filter_by(teacher_id = teacher["id"])
         mapuh = {}
@@ -214,30 +234,83 @@ def teacherdash():
     else:
         return redirect('/login')
 
-#create a course
-@app.route('/coursestc')
-def teachercourse():
+@app.route('/get_course',methods=['POST','GET'])
+def getcourse():
+    if request.method == 'POST':
+        session.pop('course',None)
+        course_id = str(request.form['course_id'])
+        course_title = str(request.form['course_title'])
+        if 'teacher' in session:
+            teacher = session['teacher']
+            courses = Course.query.filter_by(teacher_id = teacher["id"])
+            mapuh = {}
+            course = {
+                'course_id':course_id,
+                'course_title':course_title
+            }
+            session['course']=course
+            return redirect('/course')
+        else:
+            return redirect('/')
+    else:
+        return redirect('/teacherdash')
+
+@app.route('/addpost',methods=['POST','GET'])
+def addpost():
+    if request.method=='POST':
+        course_id = str(request.form['course_id'])
+        post_title = str(request.form['post_title'])
+        post_body = str(request.form['post_body'])
+        p = Post(course_id=course_id, post_body=post_body, post_title=post_title)
+        db.session.add(p)
+        db.session.commit()
+        return redirect('/course')
+    return redirect('/course')
+
+@app.route('/addassignment',methods=['POST','GET'])
+def addassignment():
+    if request.method=='POST':
+        course_id = str(request.form['course_id'])
+        task_title = str(request.form['task_title'])
+        task_body = str(request.form['task_body'])
+        task_date = datetime.strptime(request.form['task_date'], '%Y-%m-%d')
+        print(course_id)
+        print(task_date)
+        u_t = Uni_task(course_id=course_id, task_body=task_body, task_title=task_title, task_date = task_date)
+        db.session.add(u_t)
+        db.session.commit()
+        return redirect('/course')
+    return redirect('/course')
+
+
+
+@app.route('/addcourse',methods=['POST','GET'])
+def addcourse():
     if 'teacher' in session:
-        teacher = session['teacher']
-        courses = Course.query.filter_by(teacher_id = teacher["id"])
-        mapuh = {}
-        for course in courses:
-            mapuh[course.course_id] = course.course_title
-        return render_template('createcourse.html',teacher = teacher, mapuh=mapuh)
+        if request.method == 'POST':
+            course_id = str(request.form['course_id'])
+            course_name = str(request.form['course_name'])
+            teacher_id = str(request.form['teacher_id'])
+            c = Course(course_id=course_id, course_title=course_name, teacher_id=teacher_id)
+            db.session.add(c)
+            db.session.commit()
+            print(c)
+            return redirect('/teacherdash')
+        else:
+            return redirect('/teacherdash')
     else:
         return redirect('/login')
 
-@app.route('/crtclass',methods=['POST', 'GET'])
-def createcourse():
-    if 'teacher' in session:
-        teacher = session['teacher']
-        teacher_id = teacher["id"]
-        course_id = str(request.form['id'])
-        course_name = str(request.form['name'])
-        course = Course(course_id = course_id, teacher_id = teacher_id, course_title = course_name)
-        db.session.add(course)
-        db.session.commit()
-        return redirect('/teacherdash')
+
+@app.route('/course',methods=['POST','GET'])
+def course():
+    if 'teacher' and 'course' in session:
+        course = session['course']
+        c = Course.query.filter_by(course_id=course['course_id']).all()
+        posts = c[0].posts
+        uni_tasks = c[0].task_id
+        print(uni_tasks)
+        return render_template('course.html',posts=posts, course=course, uni_tasks = uni_tasks)
     else:
         return redirect('/login')
 

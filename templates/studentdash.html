@@ -1,21 +1,14 @@
 {% extends 'layout.html' %}
 
-{% block navbar %}
-<div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="/reminders">Reminders</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/todo">Tasks</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/assignments">Assignments</a>
-            </li>
-        </ul>
-</div>
-<a class="navbar-brand ml-auto" href="/logoutst">Logout</a>
-{% endblock %}
+{% block navroute %}
+/
+{% endblock navroute %}
+
+{% block navitem %}
+<ul id="nav-mobile" class="right hide-on-med-and-down">
+    <li><a href="/logoutst">Logout</a></li>
+</ul>
+{% endblock navitem %}
 
 {% block body %}
 <div class="row mt-5">

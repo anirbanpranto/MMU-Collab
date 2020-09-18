@@ -3,29 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://bootswatch.com/4/litera/bootstrap.min.css"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <title>MMU Collab</title>
+    <!-- Compiled and minified CSS -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    {% block css %}
+    {% endblock css %}
+    <title>{% block title %}{% endblock title %}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-<body>
-    <nav class="navbar navbar-dark navbar-expand-sm fixed-top bg-primary">
-        <div class="container">
-            <a class="navbar-brand mr-auto" href="/"><strong>MMU COLLAB</strong></a>
+<body class="{% block custom %}{% endblock custom %}">
+<div>
+  <div class="navbar-fixed">
+    <nav>
+        <div class="nav-wrapper  light-blue">
+          <a href="{% block navroute %}{% endblock navroute %}" class="brand-logo">COLLAB</a>
+          {% block navitem %}
+
+          {% endblock navitem %}
         </div>
-        {% block navbar %}
-        {% endblock %}
     </nav>
+  </div>
     <div class="container">
-      {% block body %}
-      {% endblock %}
+    {% block body %}
+    {% endblock body %}
+    {% block javascript %}
     </div>
-    <div class="container">
-      {% block stuff %}
-      {% endblock %}
-    </div>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.1/js/materialize.min.js" integrity="sha256-SrBfGi+Zp2LhAvy9M1bWOCXztRU9Ztztxmu5BcYPcPE=" crossorigin="anonymous"></script>
+
+    <script src="{{ url_for('static', filename='script.js') }}" type="text/javascript"></script>
+    <script>
+    $(document).ready(function(){
+
+      // Initialize materialize data picker
+      $('.datepicker').datepicker({'format': 'yyyy-mm-dd'});
+      $('select').formSelect();
+    });
+    </script>
+    {% endblock javascript %}
+</div>
 </body>
 </html>
