@@ -192,12 +192,34 @@ def studentdash():
     if 'student' in session:
         student = session['student']
         todo = Personal_task.query.filter_by(student_id = student["student_id"])
+        enrollments = Enrollment.query.filter_by(student_id = student["student_id"])
         tasks = {}
+        mapuh = {}
+        reminders = Reminder.query.filter_by(student_id = student["student_id"])
         for task in todo:
             tasks[task.task_id] = task.task_body
-        return render_template('studentdash.html',student=student,tasks=tasks)
+        for enrollment in enrollments:
+            course = Course.query.filter_by(course_id = enrollment.course_id).first()
+            mapuh[course.course_id] = course.course_title
+        return render_template('studentdash.html',student=student,tasks=tasks,reminders=reminders,mapuh=mapuh)
     else:
         return redirect('/login')
+
+@app.route('/enrollcourse',methods=['POST','GET'])
+def enrollcourse():
+    if 'student' in session:
+        if request.method == 'POST':
+            course_id = str(request.form['course_id'])
+            student_id = str(request.form['student_id'])
+            print(student_id)
+            e = Enrollment(course_id=course_id, student_id=student_id)
+            db.session.add(e)
+            db.session.commit()
+            return redirect('/studentdash')
+        else:
+            return redirect('/studentdash')
+    else:
+        return redirect('/studentdash')
 
 @app.route('/loginst',methods=['POST','GET'])
 def loginst():
@@ -242,8 +264,14 @@ def getcourse():
         course_title = str(request.form['course_title'])
         if 'teacher' in session:
             teacher = session['teacher']
-            courses = Course.query.filter_by(teacher_id = teacher["id"])
-            mapuh = {}
+            course = {
+                'course_id':course_id,
+                'course_title':course_title
+            }
+            session['course']=course
+            return redirect('/course')
+        if 'student' in session:
+            student = session['student']
             course = {
                 'course_id':course_id,
                 'course_title':course_title
@@ -253,7 +281,7 @@ def getcourse():
         else:
             return redirect('/')
     else:
-        return redirect('/teacherdash')
+        return redirect('/')
 
 @app.route('/addpost',methods=['POST','GET'])
 def addpost():
@@ -304,13 +332,20 @@ def addcourse():
 
 @app.route('/course',methods=['POST','GET'])
 def course():
-    if 'teacher' and 'course' in session:
+    if 'teacher' in session and 'course' in session:
         course = session['course']
         c = Course.query.filter_by(course_id=course['course_id']).all()
         posts = c[0].posts
         uni_tasks = c[0].task_id
         print(uni_tasks)
         return render_template('course.html',posts=posts, course=course, uni_tasks = uni_tasks)
+    if 'student' in session and 'course' in session:
+        course = session['course']
+        c = Course.query.filter_by(course_id=course['course_id']).all()
+        posts = c[0].posts
+        uni_tasks = c[0].task_id
+        print(uni_tasks)
+        return render_template('coursest.html',posts=posts, course=course, uni_tasks = uni_tasks)
     else:
         return redirect('/login')
 

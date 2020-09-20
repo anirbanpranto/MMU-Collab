@@ -11,7 +11,71 @@
 {% endblock navitem %}
 
 {% block body %}
-<div class="row mt-5">
+<div class="row center-align">
+  <button data-target="modal1" class="btn-floating btn-large light-blue modal-course modal-trigger"><i class="material-icons">add</i></button>
+</div>
+<div class="row">
+{% if not mapuh %}
+<div class="row center-align">
+  <h3>OOPS! No course yet!</h3>
+</div>
+{% endif %}
+{% for course in mapuh %}
+<!-- CODE/ID -->
+    <div class="col s12 m6">
+      <div class="card">
+        <div class="card-content course_card">
+          <span class="card-title">{{course}}({{mapuh[course]}})</span>
+        </div>
+        <div class="card-action">
+          <form class="" action="/get_course" method="post">
+            <input type="hidden" id="course_id" name="course_id" value="{{course}}">
+            <input type="hidden" id="course_title" name="course_title" value="{{mapuh[course]}}">
+            <input class="btn light-blue white-text" type="submit" name="go_button" value="See Course">
+          </form>
+        </div>
+      </div>
+    </div>
+{% endfor %}
+</div>
+<!-- Modal Trigger -->
+
+<!-- Modal Structure -->
+<div id="modal1" class="modal">
+  <div class="modal-content">
+    <div class="col s12 m6">
+      <div class="card">
+        <div class="card-content">
+          <span class="card-title">Enroll to a new course</span>
+        </div>
+        <div class="card-action">
+          <form class="validate" action="/enrollcourse" method="post">
+            <div class="row">
+              <div class="input-field col s12">
+                <input id="course_id" type="text" name = "course_id" class="validate">
+                <label for="course_id">Course Code</label>
+              </div>
+            </div>
+            <input type="hidden" name="student_id" value="{{student['student_id']}}">
+            <div class="row">
+              <div class="input-field col s6">
+                <input type="submit" name="submit" value="submit" class="btn light-blue">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('.modal');
+    var instances = M.Modal.init(elems);
+  });
+</script>
+<!-- <div class="row mt-5">
   <div class="col-md-6 m-auto">
     <h1>Hello {{ student.name }}</h1>
   </div>
@@ -60,7 +124,7 @@
                   </div>
             </div>
         {% endfor %}
-  </div>
+  </div> -->
 <!-- Body will render posts from all his courses -->
 {% endblock %}
 <!-- View Reminders and Make them -->
