@@ -1,34 +1,223 @@
 {% extends 'layout.html' %}
 
+{% block navroute %}
+/
+{% endblock navroute %}
+
+{% block navitem %}
+<ul id="nav-mobile" class="right hide-on-med-and-down">
+    <li><a href="/logoutadmin">Logout</a></li>
+</ul>
+{% endblock navitem %}
+
 {% block body %}
-<div class="row mt-5">
-    <div class="col-md-6 m-auto">
-      <div class="card card-body">
-        <h1 class="text-center mb-3">Admin Login</h1>
-        <form action="/loginroot" method="POST">
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              class="form-control"
-              placeholder="Enter Email"
-            />
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              class="form-control"
-              placeholder="Enter Password"
-            />
-          </div>
-          <button type="submit" class="btn btn-primary btn-block">Login</button>
-        </form>
-      </div>
-    </div>
+<div class="row">
+  <div class="col s12 course-nav">
+    <ul class="tabs">
+      <div class="col s1 m2"></div>
+      <li class="tab col s2 m2"><a href="#teachers" class="active light-blue white-text">Teachers</a></li>
+      <div class="col s1 m1"></div>
+      <li class="tab col s2 m2"><a class="light-blue white-text" href="#students">Students</a></li>
+      <div class="col s1 m1"></div>
+      <li class="tab col s2 m2"><a class="light-blue white-text" href="#courses">Courses</a></li>
+      <div class="col s1 m2"></div>
+    </ul>
   </div>
-  {% endblock %}
+
+  <div id="teachers" class="col s12">
+    {% if not teachers %}
+      <h5 class="center-align">No Entries Yet!</h5>
+    {% endif %}
+    {% for teacher in teachers %}
+      <div class="row">
+        <div class="col s12 m12">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">{{teacher.name}}({{teacher.email}})</span>
+            </div>
+            <div class="card-action post_body">
+              <div class="row">
+              <form class="col" action="/delteacher" method="post">
+                  <div>
+                    <input type="hidden" name="teacher_id" value="{{teacher.teacher_id}}">
+                    <button class="btn-floating btn red darken-2 modal-trigger"><i class="material-icons">delete</i></button>
+                  </div>
+              </form>
+              <div class="col">
+                <button data-target="{{teacher.teacher_id}}" class="btn-floating btn modal-trigger"><i class="material-icons">edit</i></button>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="{{teacher.teacher_id}}" class="modal">
+        <div class="modal-content">
+          <div class="col s12 m12">
+            <div class="card">
+              <div class="card-content">
+                <span class="card-title">Edit Teacher</span>
+              </div>
+              <div class="card-action">
+                <form class="validate" action="/editteacher" method="post">
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <input id="teacher_name" type="text" name = "teacher_name" placeholder="{{teacher.name}}" class="validate">
+                      <label for="name">New Teacher Name</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <input id="email" type="text" name = "email" placeholder="{{teacher.email}}" class="validate">
+                      <label for="email">New Teacher Email</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s6">
+                      <input type="hidden" name="teacher_id" value="{{teacher.teacher_id}}">
+                      <input type="submit" name="submit" value="submit" class="btn light-blue">
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+  </div>
+
+  <div id="students" class="col s12">
+    {% if not students %}
+      <h5 class="center-align">No Entries Yet!</h5>
+    {% endif %}
+    {% for student in students %}
+      <div class="row">
+        <div class="col s12 m12">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">{{student.name}}({{student.student_id}})</span>
+            </div>
+            <div class="card-action post_body">
+              <div class="row">
+              <form class="col" action="/delstudent" method="post">
+                  <div>
+                    <input type="hidden" name="student_id" value="{{student.student_id}}">
+                    <button class="btn-floating btn red darken-2 modal-trigger"><i class="material-icons">delete</i></button>
+                  </div>
+              </form>
+              <div class="col">
+                <button data-target="{{student.student_id}}" class="btn-floating btn modal-trigger"><i class="material-icons">edit</i></button>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="{{student.student_id}}" class="modal">
+        <div class="modal-content">
+          <div class="col s12 m12">
+            <div class="card">
+              <div class="card-content">
+                <span class="card-title">Edit Student</span>
+              </div>
+              <div class="card-action">
+                <form class="validate" action="/editstudent" method="post">
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <input id="name" type="text" name = "name" placeholder="{{student.name}}" class="validate">
+                      <label for="name">New Student Name</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <input id="email" type="text" name = "email" placeholder="{{student.email}}" class="validate">
+                      <label for="email">New Student Email</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s6">
+                      <input type="hidden" name="student_id" value="{{student.student_id}}">
+                      <input type="submit" name="submit" value="submit" class="btn light-blue">
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+  </div>
+
+  <div id="courses" class="col s12">
+    {% if not courses %}
+      <h5 class="center-align">No Entries Yet!</h5>
+    {% endif %}
+    {% for course in courses %}
+      <div class="row">
+        <div class="col s12 m12">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">{{course.course_title}}({{course.course_id}})</span>
+            </div>
+            <div class="card-action post_body">
+              <div class="row">
+              <form class="col" action="/delcourse" method="post">
+                  <div>
+                    <input type="hidden" name="course_id" value="{{course.course_id}}">
+                    <button class="btn-floating btn red darken-2 modal-trigger"><i class="material-icons">delete</i></button>
+                  </div>
+              </form>
+              <div class="col">
+                <button data-target="{{course.course_id}}" class="btn-floating btn modal-trigger"><i class="material-icons">edit</i></button>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div id="{{course.course_id}}" class="modal">
+        <div class="modal-content">
+          <div class="col s12 m12">
+            <div class="card">
+              <div class="card-content">
+                <span class="card-title">Edit Course</span>
+              </div>
+              <div class="card-action">
+                <form class="validate" action="/editcourse" method="post">
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <input id="course_name" type="text" name = "course_name" placeholder="{{course.course_title}}" class="validate">
+                      <label for="course_name">New Course Name</label>
+                    </div>
+                  </div>
+                  <input type="hidden" name="course_id" value="{{course.course_id}}">
+                  <div class="row">
+                    <div class="input-field col s6">
+                      <input type="submit" name="submit" value="submit" class="btn light-blue">
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+  </div>
+</div>
+
+<script type="text/javascript">
+  var el = document.querySelector('.tabs');
+  var instance = M.Tabs.init(el, {});
+  document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('.modal');
+    var instances = M.Modal.init(elems);
+  });
+</script>
+{% endblock %}

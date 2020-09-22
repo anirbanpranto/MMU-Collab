@@ -19,7 +19,7 @@ class Student(db.Model):
     personal_tasks = db.relationship('Personal_task', backref="student", lazy=True)
     reminders = db.relationship('Reminder', backref="student", lazy=True)
     def __repr__(self):
-        return f"Student('{self.student_id}', '{self.email}', '{self.name}')"
+        return f"Student('{self.student_id}', '{self.email}', '{self.name}', '{self.password}')"
 
 class Enrollment(db.Model):
     enroll_id = db.Column(db.Integer, primary_key=True)
@@ -78,7 +78,16 @@ class Teacher(db.Model):
     password = db.Column(db.String(80), nullable=False)
     courses = db.relationship('Course', backref='lecturer', lazy=True)
     def __repr__(self):
-        return f"Teacher('{self.teacher_id}', '{self.name}', '{self.email}')"
+        return f"Teacher('{self.teacher_id}', '{self.name}', '{self.email}', '{self.password}')"
+
+class Admin(db.Model):
+    admin_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), nullable=False)
+    email = db.Column(db.String(80), nullable=False)
+    password = db.Column(db.String(80), nullable=False)
+    def __repr__(self):
+        return f"Admin('{self.admin_id}', '{self.name}', '{self.email}', '{self.password}')"
+
 ## Routes
 @app.route('/')
 def index():
@@ -86,6 +95,8 @@ def index():
         return redirect('/studentdash')
     if 'teacher' in session:
         return redirect('/teacherdash')
+    if 'admin' in session:
+        return redirect('/admin')
     return render_template('index.html')
 
 @app.route('/home')
@@ -94,6 +105,8 @@ def home():
         return redirect('/studentdash')
     if 'teacher' in session:
         return redirect('/teacherdash')
+    if 'admin' in session:
+        return redirect('/admin')
     #home page
     return redirect('/')
 
@@ -104,6 +117,8 @@ def login():
         return redirect('/studentdash')
     if 'teacher' in session:
         return redirect('/teacherdash')
+    if 'admin' in session:
+        return redirect('/admin')
     return render_template('login.html')
 
 @app.route('/register')
@@ -113,6 +128,8 @@ def register():
         return redirect('/studentdash')
     if 'teacher' in session:
         return redirect('/teacherdash')
+    if 'admin' in session:
+        return redirect('/admin')
     return render_template('register.html')
 
 @app.route('/registerst',methods=['POST','GET'])
@@ -151,7 +168,6 @@ def registerst():
             return redirect('login')
     else:
         return redirect('/register')
-
 
 @app.route('/registertc',methods=['POST', 'GET'])
 def registertc():
@@ -200,21 +216,39 @@ def studentdash():
             tasks[task.task_id] = task.task_body
         for enrollment in enrollments:
             course = Course.query.filter_by(course_id = enrollment.course_id).first()
-            mapuh[course.course_id] = course.course_title
+            if course:
+                mapuh[course.course_id] = course.course_title
         return render_template('studentdash.html',student=student,tasks=tasks,reminders=reminders,mapuh=mapuh)
     else:
         return redirect('/login')
 
 @app.route('/enrollcourse',methods=['POST','GET'])
 def enrollcourse():
+    error = ''
     if 'student' in session:
         if request.method == 'POST':
             course_id = str(request.form['course_id'])
             student_id = str(request.form['student_id'])
-            print(student_id)
-            e = Enrollment(course_id=course_id, student_id=student_id)
-            db.session.add(e)
-            db.session.commit()
+            student = session['student']
+            c = Course.query.filter_by(course_id=course_id).first()
+            if not c:
+                error = "Course does not exist!"
+                todo = Personal_task.query.filter_by(student_id = student_id)
+                enrollments = Enrollment.query.filter_by(student_id = student_id)
+                tasks = {}
+                mapuh = {}
+                reminders = Reminder.query.filter_by(student_id = student_id)
+                for task in todo:
+                    tasks[task.task_id] = task.task_body
+                for enrollment in enrollments:
+                    course = Course.query.filter_by(course_id = enrollment.course_id).first()
+                    if course:
+                        mapuh[course.course_id] = course.course_title
+                return render_template('studentdash.html',student=student,tasks=tasks,reminders=reminders,mapuh=mapuh,error=error)
+            else:
+                e = Enrollment(course_id=course_id, student_id=student_id)
+                db.session.add(e)
+                db.session.commit()
             return redirect('/studentdash')
         else:
             return redirect('/studentdash')
@@ -242,6 +276,44 @@ def loginst():
         else:
             error = 'Invalid Email or Password'
             return render_template('login.html',error=error)
+
+@app.route('/admin')
+def admin():
+    if 'admin' in session:
+        admin = session['admin']
+        courses = Course.query.all();
+        teachers = Teacher.query.all();
+        students = Student.query.all();
+        return render_template('admin.html', teachers = teachers, students = students, admin=admin, courses=courses)
+    else:
+        return render_template('adminlogin.html')
+
+@app.route('/logoutadmin')
+def logoutadmin():
+    session.pop('admin',None)
+    return redirect('/admin')
+
+
+@app.route('/adminlogin', methods=['POST','GET'])
+def adminlogin():
+    if request.method == "POST":
+        password = str(request.form['password'])
+        email = str(request.form['email'])
+        if not email or not password:
+            error = 'Please fill in all the data'
+            return render_template('adminlogin.html',error=error)
+        check = Admin.query.filter_by(email=email).first()
+        if check and (check.password == password):
+            admin = {
+                'name' : check.name,
+                'id' : check.admin_id,
+                'email' : check.email,
+            }
+            session['admin'] = admin
+            return redirect('/admin')
+        else:
+            error = 'Invalid Email or Password'
+            return render_template('adminlogin.html',error=error)
 
 @app.route('/teacherdash')
 def teacherdash():
@@ -295,6 +367,72 @@ def addpost():
         return redirect('/course')
     return redirect('/course')
 
+@app.route('/addtask',methods=['POST','GET'])
+def addtask():
+    if request.method=='POST':
+        if 'student' in session:
+            student = session['student']
+            task_body = str(request.form['task_body'])
+            if task_body == '':
+                return redirect('/Todolist')
+            student_id = student['student_id']
+            t = Personal_task(student_id=student_id,task_body=task_body)
+            db.session.add(t)
+            db.session.commit()
+            return redirect('/Todolist')
+        else:
+            return redirect('/')
+    else:
+        return redirect('/')
+
+@app.route('/deltask',methods=['POST','GET'])
+def deltask():
+    if request.method=='POST':
+        if 'student' in session:
+            student = session['student']
+            task_id = str(request.form['task_id'])
+            student_id = student['student_id']
+            t = Personal_task.query.filter_by(task_id=task_id).first()
+            db.session.delete(t)
+            db.session.commit()
+            return redirect('/Todolist')
+        else:
+            return redirect('/')
+
+
+@app.route('/addreminder',methods=['POST','GET'])
+def addreminder():
+    if request.method=='POST':
+        if 'student' in session:
+            student = session['student']
+            reminder_body = str(request.form['reminder_body'])
+            reminder_date = datetime.strptime(request.form['reminder_date'], '%Y-%m-%d')
+            if reminder_body == '':
+                return redirect('/Reminders')
+            student_id = student['student_id']
+            r = Reminder(student_id=student_id,reminder_body=reminder_body, reminder_date=reminder_date)
+            db.session.add(r)
+            db.session.commit()
+            return redirect('/Reminders')
+        else:
+            return redirect('/')
+    else:
+        return redirect('/')
+
+@app.route('/delrem',methods=['POST','GET'])
+def delrem():
+    if request.method=='POST':
+        if 'student' in session:
+            student = session['student']
+            reminder_id = str(request.form['reminder_id'])
+            student_id = student['student_id']
+            r = Reminder.query.filter_by(reminder_id=reminder_id).first()
+            db.session.delete(r)
+            db.session.commit()
+            return redirect('/Reminders')
+        else:
+            return redirect('/')
+
 @app.route('/addassignment',methods=['POST','GET'])
 def addassignment():
     if request.method=='POST':
@@ -319,16 +457,128 @@ def addcourse():
             course_id = str(request.form['course_id'])
             course_name = str(request.form['course_name'])
             teacher_id = str(request.form['teacher_id'])
-            c = Course(course_id=course_id, course_title=course_name, teacher_id=teacher_id)
-            db.session.add(c)
-            db.session.commit()
-            print(c)
-            return redirect('/teacherdash')
+            course = Course.query.filter_by(course_id=course_id)
+            if not course:
+                c = Course(course_id=course_id, course_title=course_name, teacher_id=teacher_id)
+                db.session.add(c)
+                db.session.commit()
+                return redirect('/teacherdash')
+            else:
+                error = 'Course already exists'
+                session.pop('course',None)
+                teacher = session['teacher']
+                courses = Course.query.filter_by(teacher_id = teacher["id"])
+                mapuh = {}
+                for course in courses:
+                    mapuh[course.course_id] = course.course_title
+                return render_template('teacherdash.html',teacher=teacher, mapuh=mapuh, error=error)
+
         else:
             return redirect('/teacherdash')
     else:
         return redirect('/login')
 
+
+@app.route('/delcourse',methods=['POST','GET'])
+def delcourse():
+    if request.method == "POST":
+        course_id = str(request.form['course_id'])
+        tasks = Uni_task.query.filter_by(course_id=course_id).all()
+        for task in tasks:
+            db.session.delete(task)
+            db.session.commit()
+        posts = Post.query.filter_by(course_id=course_id).all()
+        for post in posts:
+            db.session.delete(post)
+            db.session.commit()
+        c = Course.query.filter_by(course_id=course_id).first()
+        db.session.delete(c)
+        db.session.commit()
+        return redirect('/')
+    else:
+        return redirect('/')
+
+@app.route('/delstudent',methods=['POST','GET'])
+def delstudent():
+    if request.method == "POST":
+        student_id = str(request.form['student_id'])
+        todos = Personal_task.query.filter_by(student_id=student_id).all()
+        for task in todos:
+            db.session.delete(task)
+            db.session.commit()
+        reminders = Reminder.query.filter_by(student_id=student_id).all()
+        for task in reminders:
+            db.session.delete(task)
+            db.session.commit()
+        enrollments = Enrollment.query.filter_by(student_id=student_id).all()
+        for entry in enrollments:
+            db.session.delete(entry)
+            db.session.commit()
+        s = Student.query.filter_by(student_id=student_id).first()
+        db.session.delete(s)
+        db.session.commit()
+        return redirect('/')
+    else:
+        return redirect('/')
+
+@app.route('/delteacher',methods=['POST','GET'])
+def delteacher():
+    if request.method == "POST":
+        teacher_id = str(request.form['teacher_id'])
+        courses = Course.query.filter_by(teacher_id=teacher_id).all()
+        for course in courses:
+            db.session.delete(course)
+            db.session.commit()
+        t = Teacher.query.filter_by(teacher_id=teacher_id).first()
+        db.session.delete(t)
+        db.session.commit()
+        return redirect('/')
+    else:
+        return redirect('/')
+
+@app.route('/editcourse', methods=['POST','GET'])
+def editcourse():
+    if request.method == "POST":
+        course_id = str(request.form['course_id'])
+        course_name = str(request.form['course_name'])
+        course = Course.query.filter_by(course_id=course_id).first()
+        course.course_title = course_name
+        db.session.commit()
+        return redirect('/')
+    else:
+        return redirect('/')
+
+@app.route('/editteacher', methods=['POST','GET'])
+def editteacher():
+    if request.method == "POST":
+        teacher_id = str(request.form['teacher_id'])
+        teacher_name = str(request.form['teacher_name'])
+        email = str(request.form['email'])
+        tc = Teacher.query.filter_by(teacher_id=teacher_id).first()
+        if email != '':
+            tc.email = email
+        if teacher_name != '':
+            tc.name = teacher_name
+        db.session.commit()
+        return redirect('/')
+    else:
+        return redirect('/')
+
+@app.route('/editstudent', methods=['POST','GET'])
+def editstudent():
+    if request.method == "POST":
+        student_id = str(request.form['student_id'])
+        name = str(request.form['name'])
+        email = str(request.form['email'])
+        tc = Student.query.filter_by(student_id=student_id).first()
+        if email != '':
+            tc.email = email
+        if name != '':
+            tc.name = name
+        db.session.commit()
+        return redirect('/')
+    else:
+        return redirect('/')
 
 @app.route('/course',methods=['POST','GET'])
 def course():
@@ -374,6 +624,24 @@ def logintc():
             error = 'Invalid Email or Password'
             return render_template('login.html',error=error)
 
+@app.route('/Todolist')
+def Todolist():
+    if 'student' in session:
+        student = session['student']
+        tasks = Personal_task.query.filter_by(student_id=student['student_id']).all()
+        return render_template('todo.html',student=student, tasks=tasks)
+    else:
+        return redirect('/login')
+
+@app.route('/Reminders')
+def Reminders():
+    if 'student' in session:
+        student = session['student']
+        reminders = Reminder.query.filter_by(student_id=student['student_id']).all()
+        return render_template('reminders.html',student=student, reminders=reminders)
+    else:
+        return redirect('/login')
+
 @app.route('/logoutst')
 def logoutst():
     #student logout logic
@@ -385,32 +653,6 @@ def logouttc():
     #teacher logout logic
     session.pop('teacher',None)
     return redirect('/login')
-
-@app.route('/add', methods=['POST', 'GET'])
-def add():
-    #add a new entry
-    if request.method == "POST":
-        if 'student' in session:
-            student = session['student']
-            todo = str(request.form['task'])
-            if todo != '':
-                data = Personal_task(task_body=todo, student_id = student['student_id'])
-                db.session.add(data)
-                db.session.commit()
-            return redirect('/studentdash')
-        else:
-            return redirect('/login')
-    else:
-        return redirect('/login')
-
-@app.route('/del', methods=['POST','GET'])
-def delete():
-    todo = str(request.form['task_id'])
-    #delete the entry
-    data = Personal_task.query.filter_by(task_id=todo).first()
-    db.session.delete(data)
-    db.session.commit()
-    return redirect('/studentdash')
 
 if __name__ == "__main__":
     app.run(debug=True)

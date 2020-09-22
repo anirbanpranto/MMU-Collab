@@ -1,0 +1,95 @@
+{% extends 'layout.html' %}
+
+{% block navroute %}
+/
+{% endblock navroute %}
+
+{% block dropdown %}
+<ul id="dropdown" class="dropdown-content light-blue-text">
+  <li><a href="/Reminders">Reminders</a></li>
+  <li><a href="/Todolist">Todolist</a></li>
+</ul>
+{% endblock dropdown %}
+
+{% block navitem %}
+<ul id="nav-mobile" class="right hide-on-med-and-down">
+    <li><a class="dropdown-trigger" href="#!" data-target="dropdown">Personal<i class="material-icons right">arrow_drop_down</i></a></li>
+    <li><a href="/logoutst">Logout</a></li>
+</ul>
+{% endblock navitem %}
+
+<script type="text/javascript">
+    M.toast({html: 'I am a toast!'})
+</script>
+
+{% block body %}
+<div class="row">
+  <div class="col s12 m12">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">Add a New Reminder</span>
+      </div>
+      <div class="card-action">
+        <form class="" action="/addreminder" method="post">
+          <div class="row">
+            <div class="input-field col s12">
+              <input id="reminder_body" type="text" name = "reminder_body" class="validate">
+              <label for="reminder_body">Reminder</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s12">
+              <input type="text" id="reminder_date" class="datepicker" name="reminder_date"></input>
+              <label for="reminder_date">Date</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s6">
+              <input type="submit" name="submit" value="Add" class="btn light-blue">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% for reminder in reminders %}
+  <div class="row">
+    <div class="col s2 m2">
+
+    </div>
+    <div class="col s8 m8">
+      <div class="card">
+        <div class="card-content ps_task">
+            {{reminder.reminder_body}}
+            <span class="badge red darken-2 white-text">Date : {{reminder.reminder_date.strftime('%Y-%m-%d')}}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col s2 m2">
+      <form class="" action="/delrem" method="POST">
+        <div class="row">
+          <div class="input-field col s6">
+            <input type="hidden" name="reminder_id" value="{{reminder.reminder_id}}">
+            <button type="submit" name="submit" value="Delete" class="btn-floating btn-large light-blue"><i class="material-icons">delete</i></button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endfor %}
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('.modal');
+    var instances = M.Modal.init(elems);
+  });
+  document.addEventListener('DOMContentLoaded', function() {
+  var elems = document.querySelectorAll('.datepicker');
+  var instances = M.Datepicker.init(elems, options);
+});
+  var dropdowns = document.querySelectorAll('.dropdown-trigger')
+  for (var i = 0; i < dropdowns.length; i++){
+    M.Dropdown.init(dropdowns[i]);
+  }
+</script>
+{% endblock %}

@@ -4,13 +4,28 @@
 /
 {% endblock navroute %}
 
+{% block dropdown %}
+<ul id="dropdown" class="dropdown-content light-blue-text">
+  <li><a href="/Reminders">Reminders</a></li>
+  <li><a href="/Todolist">Todolist</a></li>
+</ul>
+{% endblock dropdown %}
+
 {% block navitem %}
 <ul id="nav-mobile" class="right hide-on-med-and-down">
+    <li><a class="dropdown-trigger" href="#!" data-target="dropdown">Personal<i class="material-icons right">arrow_drop_down</i></a></li>
     <li><a href="/logoutst">Logout</a></li>
 </ul>
 {% endblock navitem %}
 
 {% block body %}
+{% if error %}
+<div class="materialert error">
+    <div class="material-icons">error_outline</div>
+  <span>{{error}}</span>
+  <button type="button" class="close-alert">×</button>
+</div>
+{% endif %}
 <div class="row center-align">
   <button data-target="modal1" class="btn-floating btn-large light-blue modal-course modal-trigger"><i class="material-icons">add</i></button>
 </div>
@@ -74,6 +89,10 @@
     var elems = document.querySelectorAll('.modal');
     var instances = M.Modal.init(elems);
   });
+  var dropdowns = document.querySelectorAll('.dropdown-trigger')
+  for (var i = 0; i < dropdowns.length; i++){
+    M.Dropdown.init(dropdowns[i]);
+  }
 </script>
 <!-- <div class="row mt-5">
   <div class="col-md-6 m-auto">

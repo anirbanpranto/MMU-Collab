@@ -16,6 +16,8 @@
 <body class="{% block custom %}{% endblock custom %}">
 <div>
   <div class="navbar-fixed">
+    {% block dropdown %}
+    {% endblock dropdown %}
     <nav>
         <div class="nav-wrapper  light-blue">
           <a href="{% block navroute %}{% endblock navroute %}" class="brand-logo">COLLAB</a>

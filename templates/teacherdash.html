@@ -10,6 +10,13 @@
 </ul>
 {% endblock navitem %}
 {% block body %}
+{% if error %}
+<div class="materialert error">
+    <div class="material-icons">error_outline</div>
+  <span>{{error}}</span>
+  <button type="button" class="close-alert">×</button>
+</div>
+{% endif %}
 <div class="row center-align">
   <button data-target="modal1" class="btn-floating btn-large light-blue modal-course modal-trigger"><i class="material-icons">add</i></button>
 </div>

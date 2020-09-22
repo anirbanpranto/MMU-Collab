@@ -1,11 +1,5 @@
 {% extends 'layout.html' %}
 
-{% if errors: %}
-  {% for error in (errors): %}
-    {{ error }}
-  {% endfor %}
-{% endif %}
-
 {% block navroute %}
 /
 {% endblock %}
@@ -18,12 +12,20 @@
 {% endblock %}
 
 {% block body %}
-
+{% if errors: %}
+  {% for error in (errors): %}
+  <div class="materialert error">
+      <div class="material-icons">error_outline</div>
+    <span>{{error}}</span>
+    <button type="button" class="close-alert">×</button>
+  </div>
+  {% endfor %}
+{% endif %}
 <div class="row">
   <div class="col s12">
     <ul class="tabs">
       <div class="col s2"></div>
-      <li class="tab col s3 light-blue"><a class="active white-text" href="#teacher">Teacher</a></li>
+      <li class="tab col s3 red darken-2"><a class="active white-text" href="#teacher">Teacher</a></li>
       <div class="col s2"></div>
       <li class="tab col s3 light-blue"><a class="white-text" href="#student">Student</a></li>
       <div class="col s2"></div>
@@ -37,7 +39,7 @@
 
     </div>
     <div class="col s8 m8">
-      <div class="card">
+      <div class="card pink lighten-5">
         <div class="card-content">
           <span class="card-title center">Register as  a Teacher</span>
           <!-- Form -->
@@ -69,7 +71,7 @@
               </div>
               <div class="row">
                 <div class="input-field col s6">
-                  <input type="submit" name="submit" value="submit" class="btn light-blue">
+                  <input type="submit" name="submit" value="submit" class="btn red darken-2">
                 </div>
               </div>
             </form>
@@ -90,7 +92,7 @@
 
       </div>
       <div class="col s8 m8">
-        <div class="card">
+        <div class="card light-blue lighten-5">
           <div class="card-content">
             <span class="card-title center">Register as a Student</span>
             <!-- Form -->
