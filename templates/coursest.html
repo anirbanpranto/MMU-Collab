@@ -4,9 +4,17 @@
 /
 {% endblock navroute %}
 
+{% block dropdown %}
+<ul id="dropdown" class="dropdown-content light-blue-text">
+  <li><a href="/Reminders">Reminders</a></li>
+  <li><a href="/Todolist">Todolist</a></li>
+</ul>
+{% endblock dropdown %}
+
 {% block navitem %}
 <ul id="nav-mobile" class="right hide-on-med-and-down">
-    <li><a href="/logouttc">Logout</a></li>
+    <li><a class="dropdown-trigger" href="#!" data-target="dropdown">Personal<i class="material-icons right">arrow_drop_down</i></a></li>
+    <li><a href="/logoutst">Logout</a></li>
 </ul>
 {% endblock navitem %}
 
@@ -28,11 +36,35 @@
           <div class="col s12 m12">
             <div class="card">
               <div class="card-content">
-                <span class="card-title">{{post.post_title}}</span>
+                <span class="card-title"><strong>{{post.post_title}}</strong></span>
+                <span class="badge light-blue white-text">Posted On : {{post.post_date.strftime('%Y-%m-%d')}}</span>
               </div>
               <div class="card-action post_body">
-                <span class="badge light-blue white-text">Posted On : {{post.post_date.strftime('%Y-%m-%d')}}</span>
                 <p>{{post.post_body}}</p>
+                <div class="row">
+                  <form class="" action="/makecomment" method="post">
+                    <div class="input-field col s10">
+                      <input type="text" name="comment_body" id="comment_body" class="validate">
+                      <label for="comment_body">Write Comment</label>
+                    </div>
+                    <div class="input-field">
+                      <input type="hidden" name="post_id" id="post_id" value = "{{post.post_id}} "class="validate">
+                    </div>
+                    <div class="input-field col s2">
+                      <input type="submit" name="" value="Submit" class="btn light-blue">
+                    </div>
+                  </form>
+                </div>
+                {% for comment in post.comments %}
+                <div class="row">
+                  <div class="commenter">
+                    <strong>{{comment.comment_author}}</strong> commented
+                  </div>
+                  <div class="">
+                    {{comment.comment_body}}
+                  </div>
+                </div>
+                {% endfor %}
               </div>
             </div>
           </div>
@@ -66,6 +98,10 @@
     var elems = document.querySelectorAll('.datepicker');
     var instances = M.Datepicker.init(elems, options);
   });
+  var dropdowns = document.querySelectorAll('.dropdown-trigger')
+  for (var i = 0; i < dropdowns.length; i++){
+    M.Dropdown.init(dropdowns[i]);
+  }
 </script>
 
 {% endblock %}

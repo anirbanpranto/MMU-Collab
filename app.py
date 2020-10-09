@@ -35,9 +35,34 @@ class Personal_task(db.Model):
     def __repr__(self):
         return f"Personal_task('{self.task_id}', '{self.student_id}', '{self.task_body}')"
 
+class Comment(db.Model):
+    comment_id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.post_id'), nullable=False)
+    comment_body = db.Column(db.String(200), nullable=False)
+    comment_author = db.Column(db.String(80), nullable=False)
+    def __repr__(self):
+        return f"Comment('{self.comment_id}', '{self.post_id}', '{self.comment_body}')"
+
+class Blog(db.Model):
+    blog_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(80), nullable=False)
+    blog_body = db.Column(db.String(1000), nullable=False)
+    def __repr__(self):
+        return f"Blog('{self.blog_id}', '{self.user_id}', '{self.blog_body}')"
+
+#class Friend()
+
+class BlogComment(db.Model):
+    comment_id = db.Column(db.Integer, primary_key=True)
+    blog_id = db.Column(db.Integer, nullable=False)
+    comment_body = db.Column(db.String(200), nullable=False)
+    def __repr__(self):
+        return f"BlogComment('{self.comment_id}', '{self.blog_id}', '{self.comment_body}')"
+
 class Post(db.Model):
     post_id = db.Column(db.Integer, primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.course_id'),nullable=False) #fk
+    comments = db.relationship('Comment', backref = "Comment", lazy=True)
     post_body = db.Column(db.String(1000), nullable=False)
     post_title = db.Column(db.String(80), nullable=False)
     post_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -131,6 +156,29 @@ def register():
     if 'admin' in session:
         return redirect('/admin')
     return render_template('register.html')
+
+@app.route('/makecomment', methods=['POST','GET'])
+def makecomment():
+    if 'teacher' in session:
+        teacher = session['teacher']
+        if request.method == "POST":
+            comment_body = str(request.form['comment_body'])
+            post_id = str(request.form['post_id'])
+            cmnt = Comment(comment_body=comment_body, post_id=post_id, comment_author=teacher['name'])
+            db.session.add(cmnt)
+            db.session.commit()
+            return redirect('/course')
+    if 'student' in session:
+        student = session['student']
+        if request.method == "POST":
+            comment_body = str(request.form['comment_body'])
+            post_id = str(request.form['post_id'])
+            cmnt = Comment(comment_body=comment_body, post_id=post_id, comment_author=student['name'])
+            db.session.add(cmnt)
+            db.session.commit()
+            return redirect('/course')
+    else:
+        return redirect('/')
 
 @app.route('/registerst',methods=['POST','GET'])
 def registerst():
@@ -457,7 +505,7 @@ def addcourse():
             course_id = str(request.form['course_id'])
             course_name = str(request.form['course_name'])
             teacher_id = str(request.form['teacher_id'])
-            course = Course.query.filter_by(course_id=course_id)
+            course = Course.query.filter_by(course_id=course_id).first()
             if not course:
                 c = Course(course_id=course_id, course_title=course_name, teacher_id=teacher_id)
                 db.session.add(c)
@@ -479,6 +527,67 @@ def addcourse():
         return redirect('/login')
 
 
+@app.route('/delpost', methods=['POST', 'GET'])
+def delpost():
+    if request.method == 'POST':
+        post_id = str(request.form['post_id'])
+        p = Post.query.filter_by(post_id=post_id).first()
+        for comment in p.comments:
+            db.session.delete(comment)
+            db.session.commit()
+        db.session.delete(p)
+        db.session.commit()
+        return redirect('/course')
+    else:
+        return redirect('/course')
+
+@app.route('/delassignment', methods=['POST', 'GET'])
+def delassignment():
+    if request.method == 'POST':
+        task_id = str(request.form['task_id'])
+        p = Uni_task.query.filter_by(task_id=task_id).first()
+        db.session.delete(p)
+        db.session.commit()
+        return redirect('/course')
+    else:
+        return redirect('/course')
+
+@app.route('/editassignment', methods=['POST', 'GET'])
+def editassignment():
+    if request.method == 'POST':
+        task_id = str(request.form['task_id'])
+        task_title = str(request.form['task_title'])
+        task_body = str(request.form['task_body'])
+        task_date = datetime.strptime(request.form['task_date'], '%Y-%m-%d')
+        p = Uni_task.query.filter_by(task_id=task_id).first()
+        if task_body != '':
+            p.task_body = task_body
+        if task_title != '':
+            p.task_title = task_title
+        if task_date != '':
+            p.task_date = task_date
+        db.session.commit()
+        return redirect('/course')
+    else:
+        return redirect('/course')
+
+@app.route('/editpost', methods=['POST', 'GET'])
+def editpost():
+    if request.method == 'POST':
+        post_id = str(request.form['post_id'])
+        post_title = str(request.form['post_title'])
+        post_body = str(request.form['post_body'])
+        p = Post.query.filter_by(post_id=post_id).first()
+        if post_body != '':
+            p.post_body = post_body
+        if post_title != '':
+            p.post_title = post_title
+        db.session.commit()
+        return redirect('/course')
+    else:
+        return redirect('/course')
+
+
 @app.route('/delcourse',methods=['POST','GET'])
 def delcourse():
     if request.method == "POST":
@@ -490,6 +599,10 @@ def delcourse():
         posts = Post.query.filter_by(course_id=course_id).all()
         for post in posts:
             db.session.delete(post)
+            db.session.commit()
+        enrollments = Enrollment.query.filter_by(course_id=course_id).all()
+        for enrollment in enrollments:
+            db.session.delete(enrollment)
             db.session.commit()
         c = Course.query.filter_by(course_id=course_id).first()
         db.session.delete(c)

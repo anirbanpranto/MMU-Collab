@@ -68,24 +68,90 @@
           <div class="col s12 m12">
             <div class="card">
               <div class="card-content">
-                <span class="card-title">{{post.post_title}}</span>
-              </div>
-              <div class="card-action post_body">
+                <div class="row ptitle">
+                <div class="col s10">
+                  <span class="card-title"><strong>{{post.post_title}}</strong></span>
+                </div>
+                <div class="col s2">
+                  <div class="row">
+                  <form class="col" action="/delpost" method="post">
+                      <div>
+                        <input type="hidden" name="post_id" value="{{post.post_id}}">
+                        <button class="btn-floating btn red darken-2 modal-trigger"><i class="material-icons">delete</i></button>
+                      </div>
+                  </form>
+                  <div class="col">
+                    <button data-target="{{post.post_id}}" class="btn-floating btn yellow darken-2 modal-trigger"><i class="material-icons">edit</i></button>
+                  </div>
+                  </div>
+                </div>
                 <div class="row">
                   <span class="badge light-blue white-text">Posted On : {{post.post_date.strftime('%d-%m-%Y')}}</span>
-                  <p>{{post.post_body}}</p>
                 </div>
-                <div class="row">
-                <form class="col" action="/delpost" method="post">
-                    <div>
-                      <input type="hidden" name="course_id" value="{{post.post_id}}">
-                      <button class="btn-floating btn red darken-2 modal-trigger"><i class="material-icons">delete</i></button>
-                    </div>
-                </form>
-                <div class="col">
-                  <button data-target="{{post.post_id}}" class="btn-floating btn yellow darken-2 modal-trigger"><i class="material-icons">edit</i></button>
                 </div>
               </div>
+              <div class="card-action post_body">
+              <div class="row">
+                <p>{{post.post_body}}</p>
+              </div>
+              <div class="row">
+                <form class="" action="/makecomment" method="post">
+                  <div class="input-field col s10">
+                    <input type="text" name="comment_body" id="comment_body" class="validate">
+                    <label for="comment_body">Write Comment</label>
+                  </div>
+                  <div class="input-field">
+                    <input type="hidden" name="post_id" id="post_id" value = "{{post.post_id}} "class="validate">
+                  </div>
+                  <div class="input-field col s2">
+                    <input type="submit" name="" value="Submit" class="btn light-blue">
+                  </div>
+                </form>
+              </div>
+              {% for comment in post.comments %}
+              <div class="row">
+                <div class="commenter">
+                  <strong>{{comment.comment_author}}</strong> commented
+                </div>
+                <div class="">
+                  {{comment.comment_body}}
+                </div>
+              </div>
+              {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="{{post.post_id}}" class="modal">
+          <div class="modal-content">
+            <div class="col s12 m12">
+              <div class="card">
+                <div class="card-content">
+                  <span class="card-title">Edit Post</span>
+                </div>
+                <div class="card-action">
+                  <form class="" action="/editpost" method="post">
+                    <div class="row">
+                      <div class="input-field col s12">
+                        <input id="post_title" type="text" name = "post_title" class="validate">
+                        <label for="name">Post Title</label>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="input-field col s12">
+                        <textarea id="textarea1" class="materialize-textarea" name="post_body" data-length="1000"></textarea>
+                        <label for="textarea1">Content</label>
+                      </div>
+                    </div>
+                    <input type="hidden" name="post_id" value="{{post.post_id}}">
+                    <div class="row">
+                      <div class="input-field col s6">
+                        <input type="submit" name="submit" value="submit" class="btn light-blue">
+                      </div>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
@@ -131,6 +197,7 @@
           </div>
         </div>
       </div>
+
       {% for task in uni_tasks %}
         <div class="row">
           <div class="col s12 m12">
@@ -151,14 +218,54 @@
                     </div>
                 </form>
                 <div class="col">
-                  <button data-target="{{task.task_id}}" class="btn-floating btn yellow darken-2 modal-trigger"><i class="material-icons">edit</i></button>
+                  <button data-target="{{task.task_id}}task" class="btn-floating btn yellow darken-2 modal-trigger"><i class="material-icons">edit</i></button>
                 </div>
               </div>
               </div>
             </div>
           </div>
         </div>
-        {% endfor %}
+
+        <div id="{{task.task_id}}task" class="modal">
+          <div class="modal-content">
+            <div class="col s12 m12">
+              <div class="card">
+                <div class="card-content">
+                  <span class="card-title">Edit Assignment</span>
+                </div>
+                <div class="card-action">
+                  <form class="" action="/editassignment" method="post">
+                    <div class="row">
+                      <div class="input-field col s12">
+                        <input id="task_title" type="text" name = "task_title" class="validate">
+                        <label for="name">Assignment Title</label>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="input-field col s12">
+                        <textarea id="textarea1" class="materialize-textarea" name="task_body" data-length="1000"></textarea>
+                        <label for="textarea1">Content</label>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="input-field col s12">
+                        <input type="text" id="task_date" class="datepicker" value={{task.task_date}} name="task_date"></input>
+                        <label for="task_date">Date</label>
+                      </div>
+                    </div>
+                    <input type="hidden" name="task_id" value="{{task.task_id}}">
+                    <div class="row">
+                      <div class="input-field col s6">
+                        <input type="submit" name="submit" value="submit" class="btn light-blue">
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
     </div>
 </div>
 
@@ -168,6 +275,10 @@
     document.addEventListener('DOMContentLoaded', function() {
     var elems = document.querySelectorAll('.datepicker');
     var instances = M.Datepicker.init(elems, options);
+  });
+  document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('.modal');
+    var instances = M.Modal.init(elems);
   });
 </script>
 
