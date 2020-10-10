@@ -3,13 +3,31 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_bcrypt import Bcrypt
 from werkzeug.utils import secure_filename
+from flask_mail import Mail, Message
+import os
+
+UPLOAD_FOLDER = os.getcwd()+'/static'
+print(UPLOAD_FOLDER)
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 app = Flask(__name__)
 app.secret_key = 'secret'
 bcrypt = Bcrypt()
 ##Database Models
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'company.mail.com'
+app.config['MAIL_PASSWORD'] = 'password'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 db = SQLAlchemy(app)
+mail = Mail(app)
 
 class Student(db.Model):
     student_id = db.Column(db.String(80), primary_key=True)
@@ -76,8 +94,9 @@ class Uni_task(db.Model):
     course_id = db.Column(db.Integer, db.ForeignKey('course.course_id'),nullable=False) #fk
     task_body = db.Column(db.String(1000), nullable=False)
     task_date = db.Column(db.DateTime, nullable=False)
+    task_file = db.Column(db.String(1000), nullable=True)
     def __repr__(self):
-        return f"Uni_Task('{self.task_title}','{self.task_id}', '{self.course_id}', '{self.task_body}', {self.task_date})"
+        return f"Uni_Task('{self.task_title}','{self.task_id}', '{self.course_id}', '{self.task_body}', {self.task_date}, {self.task_file})"
 
 class Course(db.Model):
     course_id = db.Column(db.String(10), primary_key=True)
@@ -488,13 +507,30 @@ def addassignment():
         task_title = str(request.form['task_title'])
         task_body = str(request.form['task_body'])
         task_date = datetime.strptime(request.form['task_date'], '%Y-%m-%d')
-        print(course_id)
-        print(task_date)
-        u_t = Uni_task(course_id=course_id, task_body=task_body, task_title=task_title, task_date = task_date)
+        file = request.files['file']
+        print(request.files)
+        task_file=''
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            task_file = filename
+        u_t = Uni_task(course_id=course_id, task_body=task_body, task_title=task_title, task_date = task_date, task_file = task_file)
         db.session.add(u_t)
         db.session.commit()
+        c = Course.query.filter_by(course_id=course_id).first()
+        emails = []
+        for enrollment in c.enrollments:
+            stid = enrollment.student_id
+            s = Student.query.filter_by(student_id=stid).first()
+            emails.append(s.email)
+        notification = "New Assignment! in " + course_id
+        if emails:
+            msg = Message(notification, sender = 'anirbanpranto@gmail.com', recipients = emails)
+            msg.body = "*"+task_title+"*"+"\n"+task_body
+            mail.send(msg)
         return redirect('/course')
-    return redirect('/course')
+    else:
+        return redirect('/course')
 
 
 
@@ -700,14 +736,12 @@ def course():
         c = Course.query.filter_by(course_id=course['course_id']).all()
         posts = c[0].posts
         uni_tasks = c[0].task_id
-        print(uni_tasks)
         return render_template('course.html',posts=posts, course=course, uni_tasks = uni_tasks)
     if 'student' in session and 'course' in session:
         course = session['course']
         c = Course.query.filter_by(course_id=course['course_id']).all()
         posts = c[0].posts
         uni_tasks = c[0].task_id
-        print(uni_tasks)
         return render_template('coursest.html',posts=posts, course=course, uni_tasks = uni_tasks)
     else:
         return redirect('/login')

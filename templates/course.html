@@ -178,7 +178,7 @@
     <div id="assignments" class="col s12">
       <div class="row">
               <div class="center"><h4>Give a New Assignment</h4></div>
-              <form class="" action="/addassignment" method="post">
+              <form class="" action="/addassignment" method="post" enctype="multipart/form-data">
                 <div class="col s3">
 
                 </div>
@@ -207,6 +207,17 @@
 
                   </div>
                 </div>
+                <div class="row">
+                  <div class="col s3">
+
+                  </div>
+                  <div class="input-field col s6">
+                    <input type="file" id="file" name="file"></input>
+                  </div>
+                  <div class="col s3">
+
+                  </div>
+                </div>
                 <input type="hidden" name="course_id" value="{{course['course_id']}}">
                 <div class="row">
                   <div class="input-field center">
@@ -229,6 +240,9 @@
                   <p>{{task.task_body}}</p>
                 </div>
                 <div class="row">
+                {% if task.task_file != '' %}
+                  <a href="{{ url_for('static', filename=task.task_file)}}" download>Download File</a>
+                {% endif %}
                 <form class="col" action="/delassignment" method="post">
                     <div>
                       <input type="hidden" name="task_id" value="{{task.task_id}}">

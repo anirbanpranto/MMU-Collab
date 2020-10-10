@@ -45,6 +45,11 @@
     </div>
     <!-- Posts -->
     <div id="posts" class="col s12">
+      {% if not posts %}
+        <div class="center">
+          <h3>No posts yet!</h3>
+        </div>
+      {% endif %}
       {% for post in posts %}
         <div class="row">
           <div class="col s12 m12">
@@ -89,6 +94,11 @@
     </div>
     <!-- Assignments -->
     <div id="assignments" class="col s12">
+      {% if not uni_tasks %}
+        <div class="center">
+          <h3>No assignments yet!</h3>
+        </div>
+      {% endif %}
       {% for task in uni_tasks %}
         <div class="row">
           <div class="col s12 m12">
@@ -99,6 +109,9 @@
               <div class="card-action post_body">
                 <span class="badge red darken-2 white-text">Due : {{task.task_date.strftime('%Y-%m-%d')}}</span>
                 <p>{{task.task_body}}</p>
+                {% if task.task_file != '' %}
+                  <a href="{{ url_for('static', filename=task.task_file)}}" download>Download File</a>
+                {% endif %}
               </div>
             </div>
           </div>
