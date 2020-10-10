@@ -13,3 +13,4 @@ This is an app for university students and Professors who can collaborate on the
 * v8.0 (Rewrote the styles and added all promised features for teachers. Reminder - Delete Functions)
 * v9.0 (Design improvements)
 * v10.0 (Email notification for reminders, assignments, due dates, sorting tasks, comments, change password etc. and cleaner forms)
+* v11.0 (File upload in assignments)
