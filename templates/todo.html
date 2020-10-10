@@ -33,28 +33,26 @@
 
 
 <div class="row">
-  <div class="col s12 m12">
-    <div class="card">
-      <div class="card-content">
-        <span class="card-title">Add a New Todo</span>
-      </div>
-      <div class="card-action">
+      <div class="center"><h4>Add a Todo!</h4></div>
         <form class="" action="/addtask" method="post">
           <div class="row">
-            <div class="input-field col s12">
+            <div class="col s3">
+
+            </div>
+            <div class="input-field col s6">
               <input id="task_body" type="text" name = "task_body" class="validate">
               <label for="task_body">Task</label>
             </div>
+            <div class="col s3">
+
+            </div>
           </div>
           <div class="row">
-            <div class="input-field col s6">
+            <div class="input-field center">
               <input type="submit" name="submit" value="Add" class="btn light-blue">
             </div>
           </div>
         </form>
-      </div>
-    </div>
-  </div>
 </div>
 {% for task in tasks %}
   <div class="row">
