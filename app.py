@@ -5,10 +5,11 @@ from flask_bcrypt import Bcrypt
 from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 import os
+from flask_crontab import Crontab
 
 UPLOAD_FOLDER = os.getcwd()+'/static'
 print(UPLOAD_FOLDER)
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'docx', 'doc', 'xlxs'}
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -17,12 +18,13 @@ def allowed_file(filename):
 app = Flask(__name__)
 app.secret_key = 'secret'
 bcrypt = Bcrypt()
+crontab = Crontab(app)
 ##Database Models
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = 'company.mail.com'
-app.config['MAIL_PASSWORD'] = 'password'
+app.config['MAIL_USERNAME'] = '********@gmail.com' #add admin's gmail
+app.config['MAIL_PASSWORD'] = '******' #add admin's password
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -133,6 +135,38 @@ class Admin(db.Model):
     def __repr__(self):
         return f"Admin('{self.admin_id}', '{self.name}', '{self.email}', '{self.password}')"
 
+#cron job
+@crontab.job(minute="0", hour="0")
+def reminderJob():
+    st = Student.query.all()
+    for student in st:
+        for reminder in student.reminders:
+            today = datetime.today().date()
+            remdate = reminder.reminder_date.date()
+            if remdate == today:
+                msg = Message("Reminder!", sender = 'anirbanpranto@gmail.com', recipients = [student.email])
+                msg.body = reminder.reminder_body
+                mail.send(msg)
+
+@crontab.job(minute="0", hour="0")
+def reminderJob2():
+    c = Course.query.all()
+    for course in c:
+        for task in course.task_id:
+            today = datetime.today().date()
+            remdate = task.task_date.date()
+            if remdate == today:
+                emails = []
+                for enrollment in course.enrollments:
+                    stid = enrollment.student_id
+                    s = Student.query.filter_by(student_id=stid).first()
+                    emails.append(s.email)
+                notification = "Due Today! in " + course.course_id
+                if emails:
+                    msg = Message(notification, sender = 'anirbanpranto@gmail.com', recipients = emails)
+                    msg.body = "*"+task.task_title+"*"+"\n"+task.task_body
+                    mail.send(msg)
+
 ## Routes
 @app.route('/')
 def index():
@@ -213,7 +247,8 @@ def registerst():
         #email find
         check = Student.query.filter_by(email=email).first()
         check = Student.query.get(student_id)
-        print(check)
+        if not is_valid:
+            errors.append('Email is not valid')
         if not password or not name or not student_id or not password2 or not email:
             errors.append('Please fill in all the information')
         if check:
@@ -247,7 +282,6 @@ def registertc():
         #checks
         errors= []
         check = Teacher.query.filter_by(email=email).first()
-        print(check)
         if not password or not name or not password2 or not email:
             errors.append('Please fill in all the information')
         if check:
@@ -734,14 +768,14 @@ def course():
     if 'teacher' in session and 'course' in session:
         course = session['course']
         c = Course.query.filter_by(course_id=course['course_id']).all()
-        posts = c[0].posts
-        uni_tasks = c[0].task_id
+        posts = Post.query.filter_by(course_id=course['course_id']).order_by(Post.post_date).all()
+        uni_tasks = Uni_task.query.filter_by(course_id=course['course_id']).order_by(Uni_task.task_date).all()
         return render_template('course.html',posts=posts, course=course, uni_tasks = uni_tasks)
     if 'student' in session and 'course' in session:
         course = session['course']
         c = Course.query.filter_by(course_id=course['course_id']).all()
-        posts = c[0].posts
-        uni_tasks = c[0].task_id
+        posts = Post.query.filter_by(course_id=course['course_id']).order_by(Post.post_date).all()
+        uni_tasks = Uni_task.query.filter_by(course_id=course['course_id']).order_by(Uni_task.task_date).all()
         return render_template('coursest.html',posts=posts, course=course, uni_tasks = uni_tasks)
     else:
         return redirect('/login')
@@ -784,7 +818,7 @@ def Todolist():
 def Reminders():
     if 'student' in session:
         student = session['student']
-        reminders = Reminder.query.filter_by(student_id=student['student_id']).all()
+        reminders = Reminder.query.filter_by(student_id=student['student_id']).order_by(Reminder.reminder_date).all()
         return render_template('reminders.html',student=student, reminders=reminders)
     else:
         return redirect('/login')

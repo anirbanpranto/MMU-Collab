@@ -10,4 +10,6 @@ This is an app for university students and Professors who can collaborate on the
 * v5.0 (Login handling has been implemented for teachers and students)
 * v6.0 (Student's personal task feature update)
 * v7.0 (Teacher add course feature update)
-* v8.0 (Rewrote the styles and added all promised features for teachers. Reminder - Delete Functions) 
+* v8.0 (Rewrote the styles and added all promised features for teachers. Reminder - Delete Functions)
+* v9.0 (Design improvements)
+* v10.0 (Email notification for reminders, assignments, due dates, sorting tasks, comments, change password etc. and cleaner forms)
