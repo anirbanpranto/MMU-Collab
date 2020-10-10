@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, url_for, redirect, session, f
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_bcrypt import Bcrypt
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = 'secret'
@@ -241,7 +242,6 @@ def registertc():
         else:
             #password hash
             hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-            print(hashed_password)
             #database push
             user = Teacher(email=email, password = hashed_password, name = name)
             db.session.add(user)
@@ -766,6 +766,56 @@ def logouttc():
     #teacher logout logic
     session.pop('teacher',None)
     return redirect('/login')
+
+@app.route('/changePass')
+def changePass():
+    if 'teacher' in session:
+        return render_template('reset.html')
+    if 'student' in session:
+        return render_template('resetst.html')
+    return redirect('/')
+
+@app.route('/passreset',methods=['POST','GET'])
+def passreset():
+    if request.method == 'POST':
+        if 'teacher' in session:
+            teacher = session['teacher']
+            check = Teacher.query.filter_by(email=teacher['email']).first()
+            old_pass = str(request.form['old_pass'])
+            new_pass = str(request.form['new_pass'])
+            if check and bcrypt.check_password_hash(str(check.password), old_pass):
+                #updatepass
+                if new_pass != '':
+                    password = bcrypt.generate_password_hash(new_pass).decode('utf-8')
+                    check.password = password
+                    db.session.commit()
+                else:
+                    error = "Empty Password cannot be set"
+                    return render_template('reset.html', error=error)
+                return redirect('/')
+            else:
+                error = "Password is not correct"
+                return render_template('reset.html', error=error)
+        if 'student' in session:
+            student = session['student']
+            check = Student.query.filter_by(student_id=student['student_id']).first()
+            old_pass = str(request.form['old_pass'])
+            new_pass = str(request.form['new_pass'])
+            if check and bcrypt.check_password_hash(str(check.password), old_pass):
+                #updatepass
+                if new_pass != '':
+                    password = bcrypt.generate_password_hash(new_pass).decode('utf-8')
+                    check.password = password
+                    db.session.commit()
+                else:
+                    error = "Empty Password cannot be set"
+                    return render_template('resetst.html', error=error)
+                return redirect('/')
+            else:
+                error = "Password is not correct"
+                return render_template('resetst.html', error=error)
+    else:
+        return redirect('/')
 
 if __name__ == "__main__":
     app.run(debug=True)

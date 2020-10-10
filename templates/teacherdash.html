@@ -6,11 +6,22 @@
 
 {% block navitem %}
 <ul id="nav-mobile" class="right hide-on-med-and-down">
-    <li><a href="/newsfeed">Newsfeed</a></li>
+    <button class="sidenav-trigger btn light-blue" href="#!" data-target="slide-out"><i class="material-icons">person</i></button>
     <li><a href="/logouttc">Logout</a></li>
 </ul>
 {% endblock navitem %}
 {% block body %}
+<ul id="slide-out" class="sidenav">
+    <li><div class="user-view">
+      <div class="background light-blue">
+
+      </div>
+      <a href="#!name"><span class="white-text name">{{session['teacher']['name']}}</span></a>
+      <a href="#!email"><span class="white-text email">{{session['teacher']['email']}}</span></a>
+    </div></li>
+    <li><a href="/changePass">Change Password</a></li>
+</ul>
+
 
 {% if error %}
 <div class="materialert error">
@@ -87,6 +98,18 @@
   document.addEventListener('DOMContentLoaded', function() {
     var elems = document.querySelectorAll('.modal');
     var instances = M.Modal.init(elems);
+  });
+  var elem = document.querySelector('.sidenav');
+  var instance = new M.Sidenav(elem);
+
+  // Initialize collapsible (uncomment the lines below if you use the dropdown variation)
+  // var collapsibleElem = document.querySelector('.collapsible');
+  // var collapsibleInstance = new M.Collapsible(collapsibleElem, options);
+
+  // Or with jQuery
+
+  $(document).ready(function(){
+    $('.sidenav').sidenav();
   });
 </script>
 {% endblock %}
