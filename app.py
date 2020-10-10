@@ -64,22 +64,6 @@ class Comment(db.Model):
     def __repr__(self):
         return f"Comment('{self.comment_id}', '{self.post_id}', '{self.comment_body}')"
 
-class Blog(db.Model):
-    blog_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(80), nullable=False)
-    blog_body = db.Column(db.String(1000), nullable=False)
-    def __repr__(self):
-        return f"Blog('{self.blog_id}', '{self.user_id}', '{self.blog_body}')"
-
-#class Friend()
-
-class BlogComment(db.Model):
-    comment_id = db.Column(db.Integer, primary_key=True)
-    blog_id = db.Column(db.Integer, nullable=False)
-    comment_body = db.Column(db.String(200), nullable=False)
-    def __repr__(self):
-        return f"BlogComment('{self.comment_id}', '{self.blog_id}', '{self.comment_body}')"
-
 class Post(db.Model):
     post_id = db.Column(db.Integer, primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.course_id'),nullable=False) #fk
