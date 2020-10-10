@@ -13,6 +13,7 @@
 
 {% block navitem %}
 <ul id="nav-mobile" class="right hide-on-med-and-down">
+    <button class="sidenav-trigger btn light-blue" href="#!" data-target="slide-out"><i class="material-icons">person</i></button>
     <li><a class="dropdown-trigger" href="#!" data-target="dropdown">Personal<i class="material-icons right">arrow_drop_down</i></a></li>
     <li><a href="/logoutst">Logout</a></li>
 </ul>
@@ -23,6 +24,17 @@
 </script>
 
 {% block body %}
+<ul id="slide-out" class="sidenav">
+    <li><div class="user-view">
+      <div class="background light-blue">
+
+      </div>
+      <a href="#!name"><span class="white-text name">{{session['student']['name']}}({{session['student']['student_id']}})</span></a>
+      <a href="#!email"><span class="white-text email">{{session['student']['student_email']}}</span></a>
+    </div></li>
+    <li><a href="#!">Change Password</a></li>
+</ul>
+
 <div class="row">
   <div class="col s12 m12">
     <div class="card">
@@ -91,5 +103,17 @@
   for (var i = 0; i < dropdowns.length; i++){
     M.Dropdown.init(dropdowns[i]);
   }
+  var elem = document.querySelector('.sidenav');
+  var instance = new M.Sidenav(elem);
+
+  // Initialize collapsible (uncomment the lines below if you use the dropdown variation)
+  // var collapsibleElem = document.querySelector('.collapsible');
+  // var collapsibleInstance = new M.Collapsible(collapsibleElem, options);
+
+  // Or with jQuery
+
+  $(document).ready(function(){
+    $('.sidenav').sidenav();
+  });
 </script>
 {% endblock %}
