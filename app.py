@@ -23,8 +23,8 @@ crontab = Crontab(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = '********@gmail.com' #add admin's gmail
-app.config['MAIL_PASSWORD'] = '******' #add admin's password
+app.config['MAIL_USERNAME'] = 'anirbanpranto@gmail.com' #add admin's gmail
+app.config['MAIL_PASSWORD'] = '9kmmrforyou' #add admin's password
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -231,8 +231,10 @@ def registerst():
         #email find
         check = Student.query.filter_by(email=email).first()
         check = Student.query.get(student_id)
-        if not is_valid:
-            errors.append('Email is not valid')
+        if email:
+            msg = Message("Welcome to Collab", sender = 'anirbanpranto@gmail.com', recipients = [email])
+            msg.body = "Welcome to our platform as a learner, we really hope you learn with us."
+            mail.send(msg)
         if not password or not name or not student_id or not password2 or not email:
             errors.append('Please fill in all the information')
         if check:
