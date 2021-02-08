@@ -30,7 +30,7 @@ flask-crontab==0.1.2
 Flask-Mail==0.9.1
 Flask-SQLAlchemy==2.4.4
 future==0.18.2
-httplib2==0.14.0
+httplib2==0.19.0
 idna==2.8
 itsdangerous==1.1.0
 jedi==0.17.2
